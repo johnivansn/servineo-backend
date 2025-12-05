@@ -110,6 +110,40 @@ export class FilterCountsService {
     };
   }
 
+  // ✅ NUEVA FUNCIÓN: Crear patrón regex que ignore acentos
+  private static createAccentInsensitivePattern(text: string): string {
+    const accentMap: Record<string, string> = {
+      'a': '[aáàäâ]',
+      'e': '[eéèëê]',
+      'i': '[iíìïî]',
+      'o': '[oóòöô]',
+      'u': '[uúùüû]',
+      'n': '[nñ]',
+      'A': '[AÁÀÄÂ]',
+      'E': '[EÉÈËÊ]',
+      'I': '[IÍÌÏÎ]',
+      'O': '[OÓÒÖÔ]',
+      'U': '[UÚÙÜÛ]',
+      'N': '[NÑ]',
+    };
+    
+    return text.split('').map(char => {
+      // Si el carácter tiene una versión con acento, usar el patrón
+      if (accentMap[char]) {
+        return accentMap[char];
+      }
+      // Si el carácter YA ES un acento, encontrar su versión base
+      const base = Object.keys(accentMap).find(key => 
+        accentMap[key].includes(char)
+      );
+      if (base) {
+        return accentMap[base];
+      }
+      // Si no es ninguna vocal con acento, devolver tal cual
+      return char;
+    }).join('');
+  }
+
   private static async getRangeCounts(
     baseQuery: MongoQuery,
     options: FilterCountsOptions
@@ -194,19 +228,22 @@ export class FilterCountsService {
     const query: MongoQuery = {};
 
     if (options.search) {
-      // Usar los mismos campos buscables que la búsqueda principal para mantener
-      // el comportamiento consistente (title, description, fixerName, category, city, tags).
-      // Construir un regex tolerante a espacios repetidos/irregulares y a
-      // separadores no alfanuméricos para que entradas como
-      // "jard     inero", "cocha----------bamba" o "--------Juan" se
-      // correspondan con los valores en la base de datos (p.ej. "jardinero",
-      // "cochabamba", "Juan").
+      // ✅ MEJORADO: Limpiar y preparar búsqueda con soporte para acentos
       const raw = String(options.search).trim();
       const cleaned = raw.replace(/[^\p{L}\p{N}]+/gu, ' ');
       const escapeForRegex = (s: string) => s.replace(/[-\\/\\^$*+?.()|[\]{}]/g, '\\$&');
       const parts = cleaned.split(/\s+/).filter(Boolean).map(escapeForRegex);
-      const pattern = parts.join('\\s*');
+      
+      // ✅ Aplicar el patrón sin acentos a cada parte
+      const accentInsensitiveParts = parts.map(part => 
+        this.createAccentInsensitivePattern(part)
+      );
+      
+      const pattern = accentInsensitiveParts.join('\\s*');
       const searchRegex = new RegExp(pattern, 'i');
+      
+      console.log('🔍 Search pattern (accent-insensitive):', pattern);
+      
       query.$or = [
         { title: searchRegex },
         { description: searchRegex },
