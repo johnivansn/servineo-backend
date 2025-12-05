@@ -194,9 +194,19 @@ export class FilterCountsService {
     const query: MongoQuery = {};
 
     if (options.search) {
-      // Use the same searchable fields as the main offers search to keep behavior consistent
-      // (title, description, fixerName, category, city, tags)
-      const searchRegex = new RegExp(options.search, 'i');
+      // Usar los mismos campos buscables que la búsqueda principal para mantener
+      // el comportamiento consistente (title, description, fixerName, category, city, tags).
+      // Construir un regex tolerante a espacios repetidos/irregulares y a
+      // separadores no alfanuméricos para que entradas como
+      // "jard     inero", "cocha----------bamba" o "--------Juan" se
+      // correspondan con los valores en la base de datos (p.ej. "jardinero",
+      // "cochabamba", "Juan").
+      const raw = String(options.search).trim();
+      const cleaned = raw.replace(/[^\p{L}\p{N}]+/gu, ' ');
+      const escapeForRegex = (s: string) => s.replace(/[-\\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const parts = cleaned.split(/\s+/).filter(Boolean).map(escapeForRegex);
+      const pattern = parts.join('\\s*');
+      const searchRegex = new RegExp(pattern, 'i');
       query.$or = [
         { title: searchRegex },
         { description: searchRegex },
