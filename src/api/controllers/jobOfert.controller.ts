@@ -180,7 +180,10 @@ export const getOffers = async (req: Request, res: Response) => {
     if (city) {
       if (typeof city === 'string') {
         // Dividir por comas si es un string
-        options.cities = city.split(',').map((c: string) => c.trim()).filter((c: string) => c.length > 0);
+        options.cities = city
+          .split(',')
+          .map((c: string) => c.trim())
+          .filter((c: string) => c.length > 0);
       } else if (Array.isArray(city)) {
         options.cities = city.map(String).filter((c: string) => c.length > 0);
       }
@@ -213,8 +216,18 @@ export const getOffers = async (req: Request, res: Response) => {
     }
 
     if (req.query.rating) {
-      const r = Number(req.query.rating);
-      if (!isNaN(r) && Number.isInteger(r) && r >= 1 && r <= 5) options.rating = r;
+      const ratingStr = String(req.query.rating).trim();
+      const r = Number(ratingStr);
+      // Aceptar tanto números enteros como decimales en el rango [1, 5.9]
+      if (!isNaN(r) && r >= 1 && r <= 5.9) {
+        options.rating = r;
+        // Indicar si fue enviado como decimal explícito (ej: "1.0", "4.2")
+        // Esto permite diferenciar entre búsqueda de rango (1) vs búsqueda exacta (1.0)
+        // Si viene de búsqueda avanzada, siempre tratarlo como decimal
+        const isAdvancedSearch =
+          req.query.advancedSearch === 'true' || req.query.advancedSearch === '1';
+        options.ratingIsDecimal = ratingStr.includes('.') || isAdvancedSearch;
+      }
     }
 
     const itemsPerPage = limit && !isNaN(Number(limit)) ? Number(limit) : 10;
@@ -339,7 +352,7 @@ export const getUniqueTags = async (req: Request, res: Response) => {
 export const getFilterCounts = async (req: Request, res: Response) => {
   // ⬅️ NUEVO: Crear AbortController
   const abortController = new AbortController();
-  
+
   // ⬅️ NUEVO: Detectar cuando el cliente cancela
   req.on('close', () => {
     if (!res.headersSent) {
@@ -349,23 +362,20 @@ export const getFilterCounts = async (req: Request, res: Response) => {
   });
 
   try {
-    const {
-      range,
-      city,
-      category,
-      search,
-      minRating,
-      maxRating,
-    } = req.query;
+    const { range, city, category, search, minRating, maxRating } = req.query;
 
     // Parsear rangos (mismo formato que getOffers)
-    const parsedRanges = range 
-      ? (Array.isArray(range) ? range.map(String) : [String(range)])
+    const parsedRanges = range
+      ? Array.isArray(range)
+        ? range.map(String)
+        : [String(range)]
       : undefined;
-    
+
     // Parsear categorías (mismo formato que getOffers)
     const parsedCategories = category
-      ? (Array.isArray(category) ? category.map(String) : [String(category)])
+      ? Array.isArray(category)
+        ? category.map(String)
+        : [String(category)]
       : undefined;
 
     // Parsear ciudad
@@ -375,23 +385,27 @@ export const getFilterCounts = async (req: Request, res: Response) => {
     const parsedSearch = search && typeof search === 'string' ? search.trim() : undefined;
 
     // Parsear ratings
-    const parsedMinRating = minRating && typeof minRating === 'string' 
-      ? parseFloat(minRating) 
-      : undefined;
-    
-    const parsedMaxRating = maxRating && typeof maxRating === 'string' 
-      ? parseFloat(maxRating) 
-      : undefined;
+    const parsedMinRating =
+      minRating && typeof minRating === 'string' ? parseFloat(minRating) : undefined;
+
+    const parsedMaxRating =
+      maxRating && typeof maxRating === 'string' ? parseFloat(maxRating) : undefined;
 
     // Validar ratings si existen
-    if (parsedMinRating !== undefined && (isNaN(parsedMinRating) || parsedMinRating < 1.0 || parsedMinRating > 5.9)) {
+    if (
+      parsedMinRating !== undefined &&
+      (isNaN(parsedMinRating) || parsedMinRating < 1.0 || parsedMinRating > 5.9)
+    ) {
       return res.status(400).json({
         success: false,
         message: 'minRating debe estar entre 1.0 y 5.9',
       });
     }
 
-    if (parsedMaxRating !== undefined && (isNaN(parsedMaxRating) || parsedMaxRating < 1.0 || parsedMaxRating > 5.9)) {
+    if (
+      parsedMaxRating !== undefined &&
+      (isNaN(parsedMaxRating) || parsedMaxRating < 1.0 || parsedMaxRating > 5.9)
+    ) {
       return res.status(400).json({
         success: false,
         message: 'maxRating debe estar entre 1.0 y 5.9',
@@ -426,7 +440,7 @@ export const getFilterCounts = async (req: Request, res: Response) => {
     }
 
     console.error('Error en getFilterCounts:', error);
-    
+
     if (!res.headersSent) {
       return res.status(500).json({
         success: false,

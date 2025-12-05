@@ -28,8 +28,10 @@ export type OfferFilterOptions = {
   // Optional specific date filter in format YYYY-MM-DD
   date?: string;
 
-  // Optional rating filter (integer 1..5)
+  // Optional rating filter (integer 1..5 for range, or decimal 1.0..5.9 for exact match)
   rating?: number;
+  // Indica si el rating fue enviado como decimal explícito (ej: "1.0", "4.2")
+  ratingIsDecimal?: boolean;
 
   searchMode?: 'exact' | 'smart';
   searchFields?: string[];
@@ -114,10 +116,16 @@ export const getOffersFiltered = async (options?: OfferFilterOptions) => {
   // 3.2. Lógica para filtro de CALIFICACIÓN (CORREGIDA)
   if (options && typeof options.rating === 'number' && !isNaN(options.rating)) {
     const star = options.rating;
+    const isDecimalForm = options.ratingIsDecimal === true;
 
-    // Si es un número entero (viene del filtro de estrellas básico)
-    if (Number.isInteger(star) && star >= 1 && star <= 5) {
-      // Lógica del filtro BÁSICO (Rango [N.0, (N+1).0))
+    // Si fue enviado como decimal explícito (ej: "1.0", "4.2")
+    if (isDecimalForm) {
+      // Comparación exacta (búsqueda para valor específico)
+      filterQuery = FilterCommon.combine(filterQuery, { rating: star });
+    }
+    // Si es número entero sin punto decimal (ej: "1", "2", "3")
+    else if (Number.isInteger(star) && star >= 1 && star <= 5) {
+      // Rango [N.0, (N+1).0) (búsqueda básica de estrellas)
       const minRating = star;
       const maxRatingExclusive = star + 1;
 
@@ -125,9 +133,9 @@ export const getOffersFiltered = async (options?: OfferFilterOptions) => {
         rating: { $gte: minRating, $lt: maxRatingExclusive },
       });
     }
-    // Si es un decimal (viene de la búsqueda avanzada o un filtro exacto)
+    // Fallback para otros decimales en rango válido
     else if (star >= 1.0 && star <= 5.9) {
-      // Lógica del filtro AVANZADO (Comparación exacta)
+      // Comparación exacta
       filterQuery = FilterCommon.combine(filterQuery, { rating: star });
     }
   }
@@ -153,7 +161,7 @@ export const getPriceRanges = async (buckets = 4, includeExtremes = true) => {
   // MEJORA AGREGADA: Verificar caché primero
   // ============================================
   const now = Date.now();
-  if (priceRangesCache && (now - priceRangesCache.timestamp) < CACHE_DURATION) {
+  if (priceRangesCache && now - priceRangesCache.timestamp < CACHE_DURATION) {
     return priceRangesCache.data;
   }
 
