@@ -2,7 +2,7 @@
 import { SortCriteria, DEFAULT_SORT_CONFIG } from '../../types/sort.types';
 import { SortService } from '../common/sort.common';
 
-function buildContactSort(order: 1 | -1) {
+function ContactSort(order: 1 | -1) {
   return {
     // Primero: ordenar , si tiene número 
     contactPhoneEmpty: 1,
@@ -33,10 +33,10 @@ export function sortOffers(sortBy?: string | SortCriteria): any {
       sortConfig.rating = -1;
       break;
     case SortCriteria.CONTACT_ASC:
-      return buildContactSort(1);
+      sortConfig.contactPhone = 1;
       break;
     case SortCriteria.CONTACT_DESC:
-      return buildContactSort(-1);
+      sortConfig.contactPhone = -1;
       break;
   }
 
