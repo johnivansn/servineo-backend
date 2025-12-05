@@ -33,10 +33,10 @@ export function sortOffers(sortBy?: string | SortCriteria): any {
       sortConfig.rating = -1;
       break;
     case SortCriteria.CONTACT_ASC:
-      sortConfig.contactPhone = 1;
+      return buildContactSort(1);
       break;
     case SortCriteria.CONTACT_DESC:
-      sortConfig.contactPhone = -1;
+      return buildContactSort(-1);
       break;
   }
 
