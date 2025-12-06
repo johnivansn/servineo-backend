@@ -32,7 +32,7 @@ export async function applyCommissionToWallet(
     preBalance: pre,
     postBalance: post,
     lowBalanceThreshold: thr,
-    prevFlags: current.flags ?? null,
+    //prevFlags: current.flags ?? null,
   });
 
   // 🔊 Log solo si cambian los flags (incluye pasar a "ok")
@@ -50,15 +50,16 @@ export async function applyCommissionToWallet(
   }
 
   // marca auditoría básica si encendiste algo
-  const patch: Partial<WalletSlice> = {
+  /*const patch: WalletPatch = {
     balance: post,
     flags: nextFlags,
   };
+
   if (nextFlags.needsLowAlert || nextFlags.needsCriticalAlert) {
     patch.lastLowBalanceNotification = new Date();
   }
-
-  await adapter.updateWalletById(fixerId, patch);
+*/
+  // await adapter.updateWalletById(fixerId, patch);
 
   return {
     preBalance: pre,
@@ -89,7 +90,7 @@ export async function applyTopUpToWallet(
     preBalance: pre,
     postBalance: post,
     lowBalanceThreshold: thr,
-    prevFlags: current.flags ?? null,
+    //prevFlags: current.flags ?? null,
   });
 
   if (changed) {

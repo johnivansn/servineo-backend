@@ -1,11 +1,10 @@
-import Jobspay from './../../models/jobsPayment.model';
-import type { Request, Response } from 'express';
 import Stripe from 'stripe';
-import Payment from '../../models/payment.model';
-import Card from '../../models/card.model';
-import { User } from '../../models/user.model';
-import Job from '../../models/jobs.model';
+import { Payment } from '../../models/payment.model';
+import { Card } from '../../models/card.model';
+import { User } from '../../models/userPayment.model';
+import { Jobspay } from '../../models/jobsPayment.model';
 import 'dotenv/config';
+import type { Request, Response } from 'express';
 import axios from 'axios'; // 🆕 Importar axios (o node-fetch si no usas axios)
 
 // Claves de Stripe

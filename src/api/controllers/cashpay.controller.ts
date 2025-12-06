@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { Payment } from '../../models/payment.model';
-import User from '../../models/usersPayment.model'; // Asegúrate de que este path sea correcto para tu modelo de usuarios
-import Jobspay from '../../models/jobs.model';
+import { User } from '../../models/userPayment.model';
+import { MongoServerError } from 'mongodb';
 
 const CODE_EXPIRATION_MS = 48 * 60 * 60 * 1000;
 

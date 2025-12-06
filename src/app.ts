@@ -3,11 +3,13 @@ dotenv.config({ path: '.env' });
 
 import express from 'express';
 import cors from 'cors';
+// import { connectDatabase } from './config/db.config';
+
 import jobOfertRoutes from './api/routes/jobOfert.routes';
 import newoffersRoutes from './api/routes/newOffers.routes';
 import fixerRoutes from './api/routes/fixer.routes';
 import jobsRoutes from './api/routes/jobs.routes';
-import activityRoutes from './api/routes/activities.routes';
+
 import CreateRoutes from './api/routes/create_appointment.routes';
 import ReadRoutes from './api/routes/read_appointment.routes';
 import UpdateRoutes from './api/routes/update_appointment.routes';
@@ -40,6 +42,9 @@ import obtenerContrasenaRouter from './api/routes/userManagement/obtener.routes'
 import adminRouter from './api/routes/userManagement/admin.routes';
 import portfolioRoutes from './routes/portfolio.routes';
 import routerUser from './api/routes/user.routes';
+// import Search from './models/search.model';
+
+import activityRoutes from './api/routes/activities.routes';
 import CardsRoutes from './api/routes/card.routes';
 import PaymentRoutes from './api/routes/payment.routes';
 import CashPayRoutes from './api/routes/cashpay.routes';
@@ -98,6 +103,8 @@ app.use((req, res, next) => {
   next();
 });
 
+// app.use('/api', HealthRoutes);
+app.use('/api/signUp', signUpRoutes);
 app.use('/api', searchRoutes);
 app.use('/api/devmaster', jobOfertRoutes);
 app.use('/api/newOffers', newoffersRoutes);
