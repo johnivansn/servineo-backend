@@ -7,7 +7,7 @@ import mongoose from 'mongoose';
 /**
  * CREATE - Crear nueva oferta de trabajo
  * POST /api/job-offers
- * 
+ *
  * Body (multipart/form-data):
  * - title: string (requerido) - Título de la oferta
  * - description: string (requerido) - Descripción detallada
@@ -31,14 +31,14 @@ export const createJobOffer = async (req: Request, res: Response) => {
     if (!files || files.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'Debe subir al menos 1 imagen'
+        message: 'Debe subir al menos 1 imagen',
       });
     }
 
     if (files.length > 5) {
       return res.status(400).json({
         success: false,
-        message: 'Máximo 5 imágenes permitidas'
+        message: 'Máximo 5 imágenes permitidas',
       });
     }
 
@@ -48,7 +48,8 @@ export const createJobOffer = async (req: Request, res: Response) => {
     if (!title || !description || !category || !city || !price || !contactPhone) {
       return res.status(400).json({
         success: false,
-        message: 'Faltan campos requeridos: title, description, category, city, price, contactPhone'
+        message:
+          'Faltan campos requeridos: title, description, category, city, price, contactPhone',
       });
     }
 
@@ -57,35 +58,56 @@ export const createJobOffer = async (req: Request, res: Response) => {
     if (isNaN(parsedPrice) || parsedPrice <= 0) {
       return res.status(400).json({
         success: false,
-        message: 'El precio debe ser un número mayor a 0'
+        message: 'El precio debe ser un número mayor a 0',
       });
     }
 
     // 4. Validar categoría
     const validCategories = [
-      'Albañil', 'Carpintero', 'Fontanero', 'Electricista', 'Pintor',
-      'Soldador', 'Jardinero', 'Cerrajero', 'Mecánico', 'Vidriero',
-      'Yesero', 'Fumigador', 'Limpiador', 'Instalador', 'Montador',
-      'Decorador', 'Pulidor', 'Techador'
+      'Albañil',
+      'Carpintero',
+      'Fontanero',
+      'Electricista',
+      'Pintor',
+      'Soldador',
+      'Jardinero',
+      'Cerrajero',
+      'Mecánico',
+      'Vidriero',
+      'Yesero',
+      'Fumigador',
+      'Limpiador',
+      'Instalador',
+      'Montador',
+      'Decorador',
+      'Pulidor',
+      'Techador',
     ];
 
     if (!validCategories.includes(category)) {
       return res.status(400).json({
         success: false,
-        message: `Categoría inválida. Debe ser una de: ${validCategories.join(', ')}`
+        message: `Categoría inválida. Debe ser una de: ${validCategories.join(', ')}`,
       });
     }
 
     // 5. Validar ciudad
     const validCities = [
-      'Beni', 'Chuquisaca', 'Cochabamba', 'La Paz', 'Oruro',
-      'Pando', 'Potosí', 'Santa Cruz', 'Tarija'
+      'Beni',
+      'Chuquisaca',
+      'Cochabamba',
+      'La Paz',
+      'Oruro',
+      'Pando',
+      'Potosí',
+      'Santa Cruz',
+      'Tarija',
     ];
 
     if (!validCities.includes(city)) {
       return res.status(400).json({
         success: false,
-        message: `Ciudad inválida. Debe ser una de: ${validCities.join(', ')}`
+        message: `Ciudad inválida. Debe ser una de: ${validCities.join(', ')}`,
       });
     }
 
@@ -104,7 +126,7 @@ export const createJobOffer = async (req: Request, res: Response) => {
       console.error('Error uploading images:', uploadError);
       return res.status(500).json({
         success: false,
-        message: 'Error al subir las imágenes a Drive'
+        message: 'Error al subir las imágenes a Drive',
       });
     }
 
@@ -134,6 +156,10 @@ export const createJobOffer = async (req: Request, res: Response) => {
       photos: imageUrls,
       tags: parsedTags,
       rating: 5, // Rating por defecto para nuevas ofertas
+      status:
+        req.body.status !== undefined
+          ? req.body.status === 'true' || req.body.status === true
+          : true,
     };
 
     const jobOffer = new Offer(jobOfferData);
@@ -142,9 +168,8 @@ export const createJobOffer = async (req: Request, res: Response) => {
     return res.status(201).json({
       success: true,
       message: 'Oferta creada exitosamente',
-      data: jobOffer
+      data: jobOffer,
     });
-
   } catch (error: any) {
     console.error('Error creating job offer:', error);
 
@@ -153,14 +178,14 @@ export const createJobOffer = async (req: Request, res: Response) => {
       return res.status(400).json({
         success: false,
         message: 'Error de validación',
-        errors: error.errors
+        errors: error.errors,
       });
     }
 
     return res.status(500).json({
       success: false,
       message: 'Error interno del servidor',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -168,7 +193,7 @@ export const createJobOffer = async (req: Request, res: Response) => {
 /**
  * GET ALL - Obtener todas las ofertas con filtros
  * GET /api/job-offers
- * 
+ *
  * Query params:
  * - category: string (opcional) - Filtrar por categoría
  * - city: string (opcional) - Filtrar por ciudad
@@ -191,7 +216,7 @@ export const getAllJobOffers = async (req: Request, res: Response) => {
       fixerId,
       sortBy = '-createdAt',
       page = '1',
-      limit = '10'
+      limit = '10',
     } = req.query;
 
     // Construir filtro
@@ -235,7 +260,7 @@ export const getAllJobOffers = async (req: Request, res: Response) => {
         .skip(skip)
         .limit(limitNum)
         .lean(),
-      Offer.countDocuments(filter)
+      Offer.countDocuments(filter),
     ]);
 
     return res.status(200).json({
@@ -247,16 +272,15 @@ export const getAllJobOffers = async (req: Request, res: Response) => {
         limit: limitNum,
         totalPages: Math.ceil(total / limitNum),
         hasNextPage: pageNum < Math.ceil(total / limitNum),
-        hasPrevPage: pageNum > 1
-      }
+        hasPrevPage: pageNum > 1,
+      },
     });
-
   } catch (error: any) {
     console.error('Error fetching job offers:', error);
     return res.status(500).json({
       success: false,
       message: 'Error al obtener las ofertas',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -264,7 +288,7 @@ export const getAllJobOffers = async (req: Request, res: Response) => {
 /**
  * GET BY FIXER ID - Obtener ofertas de un fixer específico
  * GET /api/job-offers/fixer/:fixerId
- * 
+ *
  * Params:
  * - fixerId: string (requerido) - ID del fixer
  */
@@ -276,7 +300,7 @@ export const getJobOffersByFixerId = async (req: Request, res: Response) => {
     if (!mongoose.Types.ObjectId.isValid(fixerId)) {
       return res.status(400).json({
         success: false,
-        message: 'ID de fixer inválido'
+        message: 'ID de fixer inválido',
       });
     }
 
@@ -285,15 +309,14 @@ export const getJobOffersByFixerId = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       count: jobOffers.length,
-      data: jobOffers
+      data: jobOffers,
     });
-
   } catch (error: any) {
     console.error('Error fetching fixer job offers:', error);
     return res.status(500).json({
       success: false,
       message: 'Error al obtener las ofertas del fixer',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -301,7 +324,7 @@ export const getJobOffersByFixerId = async (req: Request, res: Response) => {
 /**
  * GET BY ID - Obtener una oferta específica
  * GET /api/job-offers/:id
- * 
+ *
  * Params:
  * - id: string (requerido) - ID de la oferta
  */
@@ -313,7 +336,7 @@ export const getJobOfferById = async (req: Request, res: Response) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: 'ID de oferta inválido'
+        message: 'ID de oferta inválido',
       });
     }
 
@@ -322,21 +345,20 @@ export const getJobOfferById = async (req: Request, res: Response) => {
     if (!jobOffer) {
       return res.status(404).json({
         success: false,
-        message: 'Oferta no encontrada'
+        message: 'Oferta no encontrada',
       });
     }
 
     return res.status(200).json({
       success: true,
-      data: jobOffer
+      data: jobOffer,
     });
-
   } catch (error: any) {
     console.error('Error fetching job offer:', error);
     return res.status(500).json({
       success: false,
       message: 'Error al obtener la oferta',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -344,10 +366,10 @@ export const getJobOfferById = async (req: Request, res: Response) => {
 /**
  * UPDATE - Actualizar una oferta
  * PUT /api/job-offers/:id
- * 
+ *
  * Params:
  * - id: string (requerido) - ID de la oferta
- * 
+ *
  * Body (multipart/form-data):
  * - Cualquier campo del modelo (todos opcionales)
  * - photos: File[] (opcional) - Si se envían nuevas fotos, reemplazan las anteriores
@@ -361,7 +383,7 @@ export const updateJobOffer = async (req: Request, res: Response) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: 'ID de oferta inválido'
+        message: 'ID de oferta inválido',
       });
     }
 
@@ -371,7 +393,7 @@ export const updateJobOffer = async (req: Request, res: Response) => {
     if (!existingOffer) {
       return res.status(404).json({
         success: false,
-        message: 'Oferta no encontrada'
+        message: 'Oferta no encontrada',
       });
     }
 
@@ -384,7 +406,7 @@ export const updateJobOffer = async (req: Request, res: Response) => {
       if (isNaN(updateData.price) || updateData.price <= 0) {
         return res.status(400).json({
           success: false,
-          message: 'El precio debe ser un número mayor a 0'
+          message: 'El precio debe ser un número mayor a 0',
         });
       }
     }
@@ -404,7 +426,7 @@ export const updateJobOffer = async (req: Request, res: Response) => {
       if (files.length > 5) {
         return res.status(400).json({
           success: false,
-          message: 'Máximo 5 imágenes permitidas'
+          message: 'Máximo 5 imágenes permitidas',
         });
       }
 
@@ -432,24 +454,22 @@ export const updateJobOffer = async (req: Request, res: Response) => {
         console.error('Error uploading new images:', uploadError);
         return res.status(500).json({
           success: false,
-          message: 'Error al subir las nuevas imágenes'
+          message: 'Error al subir las nuevas imágenes',
         });
       }
     }
 
     // Actualizar oferta
-    const updatedOffer = await Offer.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true, runValidators: true }
-    );
+    const updatedOffer = await Offer.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    });
 
     return res.status(200).json({
       success: true,
       message: 'Oferta actualizada exitosamente',
-      data: updatedOffer
+      data: updatedOffer,
     });
-
   } catch (error: any) {
     console.error('Error updating job offer:', error);
 
@@ -457,14 +477,65 @@ export const updateJobOffer = async (req: Request, res: Response) => {
       return res.status(400).json({
         success: false,
         message: 'Error de validación',
-        errors: error.errors
+        errors: error.errors,
       });
     }
 
     return res.status(500).json({
       success: false,
       message: 'Error al actualizar la oferta',
-      error: error.message
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * TOGGLE STATUS - Cambiar el estado de una oferta (activo/inactivo)
+ * PATCH /api/job-offers/:id/toggle-status
+ *
+ * Params:
+ * - id: string (requerido) - ID de la oferta
+ */
+export const toggleJobOfferStatus = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    // Validar que el ID sea válido
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID de oferta inválido',
+      });
+    }
+
+    // Buscar oferta
+    const jobOffer = await Offer.findById(id);
+
+    if (!jobOffer) {
+      return res.status(404).json({
+        success: false,
+        message: 'Oferta no encontrada',
+      });
+    }
+
+    // Alternar el status
+    const updatedOffer = await Offer.findByIdAndUpdate(
+      id,
+      { status: !jobOffer.status },
+      { new: true, runValidators: true },
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: `Oferta ${updatedOffer?.status ? 'activada' : 'desactivada'} exitosamente`,
+      data: updatedOffer,
+    });
+  } catch (error: any) {
+    console.error('Error toggling job offer status:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error al cambiar el estado de la oferta',
+      error: error.message,
     });
   }
 };
@@ -472,7 +543,7 @@ export const updateJobOffer = async (req: Request, res: Response) => {
 /**
  * DELETE - Eliminar una oferta
  * DELETE /api/job-offers/:id
- * 
+ *
  * Params:
  * - id: string (requerido) - ID de la oferta
  */
@@ -484,7 +555,7 @@ export const deleteJobOffer = async (req: Request, res: Response) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: 'ID de oferta inválido'
+        message: 'ID de oferta inválido',
       });
     }
 
@@ -494,7 +565,7 @@ export const deleteJobOffer = async (req: Request, res: Response) => {
     if (!jobOffer) {
       return res.status(404).json({
         success: false,
-        message: 'Oferta no encontrada'
+        message: 'Oferta no encontrada',
       });
     }
 
@@ -512,15 +583,14 @@ export const deleteJobOffer = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       success: true,
-      message: 'Oferta eliminada exitosamente'
+      message: 'Oferta eliminada exitosamente',
     });
-
   } catch (error: any) {
     console.error('Error deleting job offer:', error);
     return res.status(500).json({
       success: false,
       message: 'Error al eliminar la oferta',
-      error: error.message
+      error: error.message,
     });
   }
 };

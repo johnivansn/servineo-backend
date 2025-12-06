@@ -19,38 +19,6 @@ export interface Search extends Document {
   createdAt: Date;
   updatedAt: Date;
 }
-/*
-const FilterSchema: Schema = new Schema(
-  {
-    is_reset: {
-      type: Boolean,
-      required: true,
-      default: false,
-    },
-    fixer_name: {
-      type: String,
-      required: true,
-      default: 'not_applied',
-    },
-    city: {
-      type: String,
-      required: true,
-      default: 'not_applied',
-    },
-    job_type: {
-      type: String,
-      required: true,
-      default: 'not_applied',
-    },
-    search_count: {
-      type: Number,
-      required: true,
-      default: 0,
-    },
-  },
-  { _id: false },
-);
-*/
 const SearchSchema: Schema = new Schema(
   {
     user_type: {

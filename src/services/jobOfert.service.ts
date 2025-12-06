@@ -33,6 +33,9 @@ export type OfferFilterOptions = {
 
   searchMode?: 'exact' | 'smart';
   searchFields?: string[];
+
+  // Optional status filter (boolean)
+  status?: boolean;
 };
 
 // ============================================
@@ -132,6 +135,11 @@ export const getOffersFiltered = async (options?: OfferFilterOptions) => {
     }
   }
 
+  // 3.3. Lógica para filtro de STATUS
+  if (options && typeof options.status === 'boolean') {
+    filterQuery = FilterCommon.combine(filterQuery, { status: options.status });
+  }
+
   const finalQuery = FilterCommon.combine(filterQuery, searchQuery);
 
   // 4. APLICAR ORDENAMIENTO Y PAGINACIÓN
@@ -153,7 +161,7 @@ export const getPriceRanges = async (buckets = 4, includeExtremes = true) => {
   // MEJORA AGREGADA: Verificar caché primero
   // ============================================
   const now = Date.now();
-  if (priceRangesCache && (now - priceRangesCache.timestamp) < CACHE_DURATION) {
+  if (priceRangesCache && now - priceRangesCache.timestamp < CACHE_DURATION) {
     return priceRangesCache.data;
   }
 

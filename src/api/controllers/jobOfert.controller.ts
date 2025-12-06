@@ -40,6 +40,7 @@ export const getOffers = async (req: Request, res: Response) => {
       userId,
       searchTerm,
       record,
+      status,
     } = req.query;
 
     // ==================== ACCIÓN: GET PRICE RANGES ====================
@@ -162,7 +163,8 @@ export const getOffers = async (req: Request, res: Response) => {
       !minPrice &&
       !maxPrice &&
       !req.query.date &&
-      !req.query.rating
+      !req.query.rating &&
+      !status
     ) {
       const offers = await getAllOffers();
       return res.status(200).json({
@@ -180,7 +182,10 @@ export const getOffers = async (req: Request, res: Response) => {
     if (city) {
       if (typeof city === 'string') {
         // Dividir por comas si es un string
-        options.cities = city.split(',').map((c: string) => c.trim()).filter((c: string) => c.length > 0);
+        options.cities = city
+          .split(',')
+          .map((c: string) => c.trim())
+          .filter((c: string) => c.length > 0);
       } else if (Array.isArray(city)) {
         options.cities = city.map(String).filter((c: string) => c.length > 0);
       }
@@ -198,6 +203,13 @@ export const getOffers = async (req: Request, res: Response) => {
     if (tags) options.tags = Array.isArray(tags) ? tags.map(String) : String(tags);
     if (minPrice && typeof minPrice === 'string') options.minPrice = minPrice;
     if (maxPrice && typeof maxPrice === 'string') options.maxPrice = maxPrice;
+    if (status !== undefined) {
+      if (status === 'true' || status === '1') {
+        options.status = true;
+      } else if (status === 'false' || status === '0') {
+        options.status = false;
+      }
+    }
 
     const sortCandidate =
       (typeof sortBy === 'string' && sortBy) || (typeof sort === 'string' && sort);
@@ -339,7 +351,7 @@ export const getUniqueTags = async (req: Request, res: Response) => {
 export const getFilterCounts = async (req: Request, res: Response) => {
   // ⬅️ NUEVO: Crear AbortController
   const abortController = new AbortController();
-  
+
   // ⬅️ NUEVO: Detectar cuando el cliente cancela
   req.on('close', () => {
     if (!res.headersSent) {
@@ -349,23 +361,20 @@ export const getFilterCounts = async (req: Request, res: Response) => {
   });
 
   try {
-    const {
-      range,
-      city,
-      category,
-      search,
-      minRating,
-      maxRating,
-    } = req.query;
+    const { range, city, category, search, minRating, maxRating } = req.query;
 
     // Parsear rangos (mismo formato que getOffers)
-    const parsedRanges = range 
-      ? (Array.isArray(range) ? range.map(String) : [String(range)])
+    const parsedRanges = range
+      ? Array.isArray(range)
+        ? range.map(String)
+        : [String(range)]
       : undefined;
-    
+
     // Parsear categorías (mismo formato que getOffers)
     const parsedCategories = category
-      ? (Array.isArray(category) ? category.map(String) : [String(category)])
+      ? Array.isArray(category)
+        ? category.map(String)
+        : [String(category)]
       : undefined;
 
     // Parsear ciudad
@@ -375,23 +384,27 @@ export const getFilterCounts = async (req: Request, res: Response) => {
     const parsedSearch = search && typeof search === 'string' ? search.trim() : undefined;
 
     // Parsear ratings
-    const parsedMinRating = minRating && typeof minRating === 'string' 
-      ? parseFloat(minRating) 
-      : undefined;
-    
-    const parsedMaxRating = maxRating && typeof maxRating === 'string' 
-      ? parseFloat(maxRating) 
-      : undefined;
+    const parsedMinRating =
+      minRating && typeof minRating === 'string' ? parseFloat(minRating) : undefined;
+
+    const parsedMaxRating =
+      maxRating && typeof maxRating === 'string' ? parseFloat(maxRating) : undefined;
 
     // Validar ratings si existen
-    if (parsedMinRating !== undefined && (isNaN(parsedMinRating) || parsedMinRating < 1.0 || parsedMinRating > 5.9)) {
+    if (
+      parsedMinRating !== undefined &&
+      (isNaN(parsedMinRating) || parsedMinRating < 1.0 || parsedMinRating > 5.9)
+    ) {
       return res.status(400).json({
         success: false,
         message: 'minRating debe estar entre 1.0 y 5.9',
       });
     }
 
-    if (parsedMaxRating !== undefined && (isNaN(parsedMaxRating) || parsedMaxRating < 1.0 || parsedMaxRating > 5.9)) {
+    if (
+      parsedMaxRating !== undefined &&
+      (isNaN(parsedMaxRating) || parsedMaxRating < 1.0 || parsedMaxRating > 5.9)
+    ) {
       return res.status(400).json({
         success: false,
         message: 'maxRating debe estar entre 1.0 y 5.9',
@@ -426,7 +439,7 @@ export const getFilterCounts = async (req: Request, res: Response) => {
     }
 
     console.error('Error en getFilterCounts:', error);
-    
+
     if (!res.headersSent) {
       return res.status(500).json({
         success: false,

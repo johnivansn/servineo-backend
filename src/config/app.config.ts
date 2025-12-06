@@ -8,6 +8,6 @@ export const ENV = {
 
 export const appConfig = {
   mongoUri:
-    'mongodb+srv://loremipsum:FY560KjK7KGsO6BG@clusterservineo.yotr2ip.mongodb.net/ServineoBD?retryWrites=true&w=majority&appName=ClusterServineo',
+    'mongodb+srv://sudoers:mOG7495o6IH4Nnjf@clusterservineo.yotr2ip.mongodb.net/ServineoBD?retryWrites=true&w=majority&appName=ClusterServineo',
   // ... otras configuraciones
 };

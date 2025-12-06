@@ -9,5 +9,6 @@ router.post('/', controller.createPromotion);
 router.put('/:id', controller.updatePromotion);
 router.delete('/:id', controller.deletePromotion);
 router.get('/offer/:offerId', controller.getPromotionsByOfferId);
+router.patch('/:id', controller.updatePromotion);
 
 export default router;

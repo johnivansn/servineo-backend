@@ -58,7 +58,6 @@ export async function unlinkLoginMethod(req: Request, res: Response) {
 
     const mongoClient = await clientPromise;
     const db = mongoClient.db("ServineoBD");
-
     const user = await db.collection("users").findOne({ _id: new ObjectId(userId) });
     if (!user) {
       return res.status(404).json({
@@ -74,7 +73,6 @@ export async function unlinkLoginMethod(req: Request, res: Response) {
         message: `El método ${provider} no está vinculado.`,
       });
     }
-
     const result = await db.collection("users").findOneAndUpdate(
       { _id: new ObjectId(userId) },
       { $pull: { authProviders: { provider } } } as unknown as import("mongodb").UpdateFilter<any>,
@@ -279,11 +277,23 @@ export async function linkGoogleMethod(req: Request, res: Response) {
       return res.status(404).json({ status: "error", message: "Usuario no encontrado" });
     }
 
-    const yaVinculado = Array.isArray(user.authProviders) && user.authProviders.some((p: any) => p.provider === "google");
+    const yaVinculado = Array.isArray(user.authProviders) &&
+      user.authProviders.some((p: any) => p.provider === "google");
+
     if (yaVinculado) {
       return res.status(400).json({
         status: "error",
         message: "Ya tienes una cuenta de Google vinculada.",
+      });
+    }
+
+    // AQUÍ CAMBIAMOS: guardamos el correo en lugar del ID de Google
+    const providerId = googleData.email;
+
+    if (!providerId) {
+      return res.status(400).json({
+        status: "error",
+        message: "No se pudo obtener el correo del token de Google.",
       });
     }
 
@@ -294,7 +304,7 @@ export async function linkGoogleMethod(req: Request, res: Response) {
         $push: {
           authProviders: {
             provider: "google",
-            providerId: googleData.sub,
+            providerId: providerId, // <--- correo en lugar del sub
             linkedAt: now,
           },
         },
@@ -310,9 +320,10 @@ export async function linkGoogleMethod(req: Request, res: Response) {
     }
 
     const updated = (result as any).value || result;
+
     const authProvidersSafe = (updated.authProviders || []).map((p: any) => ({
       provider: p.provider,
-      providerId: p.providerId,
+      providerId: p.providerId, 
       linkedAt: p.linkedAt ? new Date(p.linkedAt).toISOString() : undefined,
     }));
 
