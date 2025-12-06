@@ -35,6 +35,9 @@ export type OfferFilterOptions = {
 
   searchMode?: 'exact' | 'smart';
   searchFields?: string[];
+
+  // Optional status filter (boolean)
+  status?: boolean;
 };
 
 // ============================================
@@ -138,6 +141,11 @@ export const getOffersFiltered = async (options?: OfferFilterOptions) => {
       // Comparación exacta
       filterQuery = FilterCommon.combine(filterQuery, { rating: star });
     }
+  }
+
+  // 3.3. Lógica para filtro de STATUS
+  if (options && typeof options.status === 'boolean') {
+    filterQuery = FilterCommon.combine(filterQuery, { status: options.status });
   }
 
   const finalQuery = FilterCommon.combine(filterQuery, searchQuery);

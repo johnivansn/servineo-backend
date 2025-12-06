@@ -1,0 +1,59 @@
+# Node output
+dist/
+node_modules/
+
+# Lock file (normalmente se debe subir)
+# Eliminar esta línea si quieres subir package-lock.json
+# package-lock.json
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Lock files
+package-lock.json
+
+# Environment
+.env*
+!.env.example
+
+# DB local by docker
+database/*
+database-pg/*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Tests
+coverage/
+.nyc_output/
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Temporary / weird files
+*~
+*.tmp
+
+# Vercel local build cache
+.vercel/
+.vercel

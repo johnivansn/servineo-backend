@@ -1,31 +1,33 @@
 import { Request, Response } from 'express';
-import Device from '../../../models/divice.model';
+import Device from '../../../models/device.model';
 
-// Registrar o actualizar un dispositivo
+// device.controller.ts - Ya está bien, solo verifica que funcione
 export const registrarDispositivo = async (req: Request, res: Response) => {
   try {
     const { userId, os, type } = req.body;
-    const userAgent = req.body.userAgent || req.headers["user-agent"] || "unknown";
+    const userAgent = req.body.userAgent || req.headers['user-agent'] || 'unknown';
 
     if (!userId || !os || !type) {
-      return res.status(400).json({ message: "Faltan datos requeridos" });
+      return res.status(400).json({ message: 'Faltan datos requeridos' });
     }
 
-    // Buscar dispositivo por userId y userAgent (más confiable)
+    // Buscar por userId Y userAgent (clave para evitar duplicados)
     let dispositivo = await Device.findOne({ userId, userAgent });
 
     if (dispositivo) {
       // Ya existe → solo actualizar lastLogin
       dispositivo.lastLogin = new Date();
+      dispositivo.os = os; // Actualizar también el OS por si cambió
+      dispositivo.type = type;
       await dispositivo.save();
 
       return res.json({
-        message: "Dispositivo actualizado",
+        message: 'Dispositivo actualizado',
         dispositivo,
       });
     }
 
-    // Crear uno nuevo
+    // Crear uno nuevo solo si no existe
     dispositivo = new Device({
       userId,
       os,
@@ -37,13 +39,12 @@ export const registrarDispositivo = async (req: Request, res: Response) => {
     await dispositivo.save();
 
     res.json({
-      message: "Dispositivo registrado",
+      message: 'Dispositivo registrado',
       dispositivo,
     });
-
   } catch (err) {
-    console.error("Error registrarDispositivo:", err);
-    res.status(500).json({ message: "Error interno del servidor" });
+    console.error('Error registrarDispositivo:', err);
+    res.status(500).json({ message: 'Error interno del servidor' });
   }
 };
 
@@ -65,7 +66,7 @@ export const eliminarTodasExceptoActual = async (req: Request, res: Response) =>
     const { userId } = req.params;
     const { except } = req.body;
 
-    if (!userId) return res.status(400).json({ message: "Falta userId" });
+    if (!userId) return res.status(400).json({ message: 'Falta userId' });
 
     await Device.deleteMany({
       userId,
@@ -73,7 +74,7 @@ export const eliminarTodasExceptoActual = async (req: Request, res: Response) =>
     });
 
     res.json({
-      message: "Todas las sesiones eliminadas excepto la actual",
+      message: 'Todas las sesiones eliminadas excepto la actual',
     });
   } catch (err) {
     console.error('Error eliminarTodasExceptoActual:', err);

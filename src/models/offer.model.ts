@@ -64,6 +64,7 @@ const offerSchema = new Schema(
       },
     },
     rating: { type: Number, required: true, min: 1, max: 5 },
+    status: { type: Boolean, required: true, default: true },
   },
   {
     timestamps: true,

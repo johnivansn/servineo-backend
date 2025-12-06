@@ -5,6 +5,7 @@ import { connectDB } from './config/db/mongoClient';
 import { startJobsStatusCollectorCron } from './services/jobs-status-collector.cron';
 import http from 'http';
 
+// 🚀 Función para iniciar el servidor
 async function startServer() {
   try {
     await connectDatabase();
@@ -31,6 +32,7 @@ async function startServer() {
     });
 
     startJobsStatusCollectorCron();
+    
   } catch (error) {
     console.error('❌ Error starting server:', error);
     process.exit(1);

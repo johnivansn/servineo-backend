@@ -8,6 +8,14 @@ export interface IWallet extends Document {
   minimumBalance: number;
   lowBalanceThreshold: number;
   lastLowBalanceNotification?: Date;
+
+  flags?: {
+    needsLowAlert: boolean;
+    needsCriticalAlert: boolean;
+    cooldownUntil?: Date | null;
+    updatedAt?: Date;
+  };
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -43,6 +51,26 @@ const walletSchema = new Schema<IWallet>(
       type: Number,
       default: 50,
     },
+
+    flags: {
+      needsLowAlert: {
+        type: Boolean,
+        default: false,
+      },
+      needsCriticalAlert: {
+        type: Boolean,
+        default: false,
+      },
+      cooldownUntil: {
+        type: Date,
+        default: null,
+      },
+      updatedAt: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+    
     lastLowBalanceNotification: {
       type: Date,
       required: false,

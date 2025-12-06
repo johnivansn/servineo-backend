@@ -90,16 +90,11 @@ async function updateClickCountAtomically(
           return acc;
         }, {} as any),
         'metadata.clickCount': {
-          $divide: [
-            {
-              $cond: {
-                if: { $gt: [{ $ifNull: ['$metadata.clickCount', 0] }, 0] },
-                then: { $add: [{ $multiply: [{ $ifNull: ['$metadata.clickCount', 0] }, 2] }, 1] },
-                else: 1,
-              },
-            },
-            2,
-          ],
+          $cond: {
+            if: { $gt: [{ $ifNull: ['$metadata.clickCount', 0] }, 0] },
+            then: { $add: [{ $ifNull: ['$metadata.clickCount', 0] }, 1] },
+            else: 1,
+          },
         },
       },
     },
@@ -140,14 +135,11 @@ async function updateClickCountAtomically(
     } as any).exec();
 
     if (existing) {
-      const currentCount = (existing.metadata as any)?.clickCount || 0;
-      const originalCount = currentCount * 2;
-      const newCount = (originalCount + 1) / 2;
       upsertResult = await Activity.findByIdAndUpdate(
         existing._id,
         {
+          $inc: { 'metadata.clickCount': 1 },
           $set: {
-            'metadata.clickCount': newCount,
             timestamp: timestamp,
             date: adjustedDate,
             role: role,
@@ -166,7 +158,7 @@ async function updateClickCountAtomically(
 
   const finalResult = upsertResult as any;
   const clickCount = finalResult?.metadata?.clickCount || 0;
-  const isUpdate = clickCount > 0.5;
+  const isUpdate = clickCount > 1;
 
   return {
     activity: finalResult as unknown as ActivityDoc,

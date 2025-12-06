@@ -13,7 +13,7 @@ export const getCommentsByFixer = async (req: Request, res: Response) => {
   try {
     const comments = await getCommentsByFixerService(fixerId);
     if (comments.length === 0) {
-      return res.status(404).json({ message: 'No comments found' });
+      return res.status(200).json([]);
     }
     // Put anomity if requesterId is not linked (DB IS TRASH)
     // I think we can remove this once the db is cleaned
@@ -41,7 +41,7 @@ export const getPositiveCommentsByFixer = async (req: Request, res: Response) =>
   try {
     const comments = await getCommentsByFixerService(fixerId);
     if (comments.length === 0) {
-      return res.status(404).json({ message: 'No comments found' });
+      return res.status(200).json([]);
     }
     // Put anomity if requesterId is not linked (DB IS TRASH)
     // I think we can remove this once the db is cleaned
@@ -74,7 +74,7 @@ export const getNegativeCommentsByFixer = async (req: Request, res: Response) =>
   try {
     const comments = await getCommentsByFixerService(fixerId);
     if (comments.length === 0) {
-      return res.status(404).json({ message: 'No comments found' });
+      return res.status(200).json([]);
     }
     // Put anomity if requesterId is not linked (DB IS TRASH)
     // I think we can remove this once the db is cleaned

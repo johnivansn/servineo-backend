@@ -1,4 +1,4 @@
-import { User } from '../../models/userPayment.model';
+import { User } from '../../models/user.model';
 import { Request, Response } from 'express';
 
 // Listar todos los usuarios

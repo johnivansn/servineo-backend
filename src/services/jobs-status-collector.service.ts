@@ -1,8 +1,8 @@
 import { Types } from 'mongoose';
-import { Job } from '../models/jobs.model';
+import Job from '../models/jobs.model';
 import { Activity, ActivityDoc } from '../models/activities.model';
 
-const FIXER_ID = '68e87a9cdae3b73d8040102f';
+const FIXER_ID = '692d0a50612c1b49b671ee48';
 const ROLE = 'fixer';
 const TYPE = 'daily_jobs_status';
 

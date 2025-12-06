@@ -40,6 +40,7 @@ export const getOffers = async (req: Request, res: Response) => {
       userId,
       searchTerm,
       record,
+      status,
     } = req.query;
 
     // ==================== ACCIÓN: GET PRICE RANGES ====================
@@ -162,7 +163,8 @@ export const getOffers = async (req: Request, res: Response) => {
       !minPrice &&
       !maxPrice &&
       !req.query.date &&
-      !req.query.rating
+      !req.query.rating &&
+      !status
     ) {
       const offers = await getAllOffers();
       return res.status(200).json({
@@ -201,6 +203,13 @@ export const getOffers = async (req: Request, res: Response) => {
     if (tags) options.tags = Array.isArray(tags) ? tags.map(String) : String(tags);
     if (minPrice && typeof minPrice === 'string') options.minPrice = minPrice;
     if (maxPrice && typeof maxPrice === 'string') options.maxPrice = maxPrice;
+    if (status !== undefined) {
+      if (status === 'true' || status === '1') {
+        options.status = true;
+      } else if (status === 'false' || status === '0') {
+        options.status = false;
+      }
+    }
 
     const sortCandidate =
       (typeof sortBy === 'string' && sortBy) || (typeof sort === 'string' && sort);

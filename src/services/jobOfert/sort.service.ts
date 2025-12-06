@@ -2,6 +2,15 @@
 import { SortCriteria, DEFAULT_SORT_CONFIG } from '../../types/sort.types';
 import { SortService } from '../common/sort.common';
 
+function ContactSort(order: 1 | -1) {
+  return {
+    // Primero: ordenar , si tiene número 
+    contactPhoneEmpty: 1,
+    contactPhoneSort: order,
+  };
+}
+
+
 export function sortOffers(sortBy?: string | SortCriteria): any {
   const criteria = sortBy || DEFAULT_SORT_CONFIG.sortBy;
 

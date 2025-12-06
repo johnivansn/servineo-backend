@@ -1,11 +1,11 @@
-import { Schema, model, models, Document, Types } from "mongoose";
+import { Schema, model, models, Document, Types } from 'mongoose';
 
 export interface IUser extends Document {
   name: string;
   email: string;
   url_photo?: string;
-  role: string;
   description?: string;
+  role: string;
 
   authProviders?: Array<{
     provider: string;
@@ -39,6 +39,10 @@ export interface IUser extends Document {
     tarjetaCredito?: boolean;
   };
 
+  experience?: {
+    descripcion?: string;
+  };
+
   workLocation?: {
     lat?: number;
     lng?: number;
@@ -46,6 +50,8 @@ export interface IUser extends Document {
     departamento?: string;
     pais?: string;
   };
+
+  stripeCustomerId?: string; // ⚡ Campo nuevo para Stripe
 }
 
 const userSchema = new Schema<IUser>(
@@ -64,8 +70,8 @@ const userSchema = new Schema<IUser>(
 
     role: {
       type: String,
-      enum: ["requester", "fixer", "visitor", "admin"],
-      default: "requester",
+      enum: ['requester', 'fixer', 'visitor', 'admin'],
+      default: 'requester',
     },
 
     authProviders: [
@@ -113,11 +119,17 @@ const userSchema = new Schema<IUser>(
       departamento: { type: String },
       pais: { type: String },
     },
+
+    experience: {
+      descripcion: { type: String },
+    },
+
+    stripeCustomerId: { type: String }, // ⚡ Agregado
   },
   {
-    collection: "users",
+    collection: 'users',
     timestamps: true,
-  }
+  },
 );
 
-export const User = models.User || model<IUser>("User", userSchema);
+export const User = models.User || model<IUser>('User', userSchema);

@@ -31,7 +31,6 @@ export async function checkUserExists(email: string): Promise<boolean> {
 export async function createManualUser(
   user: ManualUser
 ): Promise<InsertedUser & { _id: string; picture?: string }> {
-
   const hashedPassword = await bcrypt.hash(user.password, 10);
 
   const newUserData: Partial<IUser> = {
@@ -73,7 +72,6 @@ export async function createManualUser(
       qr: false,
       tarjetaCredito: false,
     },
-
 
 
     workLocation: {
