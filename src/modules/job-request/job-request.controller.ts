@@ -47,11 +47,7 @@ export async function createJobRequest(req: Request, res: Response) {
     }
 
     const db = await connectDB();
-    const newJobRequest = await jobRequestService.createJobRequest(
-      db,
-      jobRequestData,
-      requesterId,
-    );
+    const newJobRequest = await jobRequestService.createJobRequest(db, jobRequestData, requesterId);
 
     res.status(201).json(newJobRequest);
   } catch (error) {

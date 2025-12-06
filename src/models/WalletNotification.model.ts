@@ -1,16 +1,16 @@
 // src/models/WalletNotification.model.ts
-import { Schema, model, models, InferSchemaType } from "mongoose";
+import { Schema, model, models, InferSchemaType } from 'mongoose';
 
 const WalletNotificationSchema = new Schema(
   {
-    walletId: { type: Schema.Types.ObjectId, ref: "Wallet", required: true },
-    fixerId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    walletId: { type: Schema.Types.ObjectId, ref: 'Wallet', required: true },
+    fixerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 
     type: {
       type: String,
-      enum: ["LOW_BALANCE"],
+      enum: ['LOW_BALANCE'],
       required: true,
-      default: "LOW_BALANCE",
+      default: 'LOW_BALANCE',
     },
 
     // Texto que mostraremos tanto en email/push como en el toast
@@ -20,8 +20,8 @@ const WalletNotificationSchema = new Schema(
     // Para la HU: enviada | leída | acción tomada
     status: {
       type: String,
-      enum: ["sent", "read", "action_taken"],
-      default: "sent",
+      enum: ['sent', 'read', 'action_taken'],
+      default: 'sent',
       index: true,
     },
 
@@ -29,15 +29,15 @@ const WalletNotificationSchema = new Schema(
     reminderIndex: { type: Number, default: 1 },
 
     // Canales usados (por ahora "system" y "email" como mínimos)
-    channels: [{ type: String, enum: ["system", "email", "push"] }],
+    channels: [{ type: String, enum: ['system', 'email', 'push'] }],
 
     // Para controlar “máximo 3 notificaciones en 7 días”
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 
     // Para programar recordatorios 24h / 48h
-    scheduledFor: { type: Date },   // cuándo debería enviarse este recordatorio
-    sentAt: { type: Date },         // cuándo realmente se envió
+    scheduledFor: { type: Date }, // cuándo debería enviarse este recordatorio
+    sentAt: { type: Date }, // cuándo realmente se envió
     readAt: { type: Date },
     actionTakenAt: { type: Date },
 
@@ -46,11 +46,10 @@ const WalletNotificationSchema = new Schema(
     recommendedTopUp: { type: Number, default: 50 },
   },
   {
-    collection: "wallet_notifications",
+    collection: 'wallet_notifications',
     timestamps: true,
-  }
+  },
 );
 
 export type WalletNotification = InferSchemaType<typeof WalletNotificationSchema>;
-export default models.WalletNotification ||
-  model("WalletNotification", WalletNotificationSchema);
+export default models.WalletNotification || model('WalletNotification', WalletNotificationSchema);

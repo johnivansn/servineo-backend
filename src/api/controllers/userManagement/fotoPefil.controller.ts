@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import fs from "fs";
+import fs from 'fs';
 import { updateUserPhoto } from '../../../services/userManagement/fotoPerfil.service';
 import { getUserById } from '../../../services/userManagement/registrarDatos.service';
 import { generarToken } from '../../../utils/generadorToken';
@@ -22,7 +22,7 @@ export async function actualizarFotoPerfil(req: Request, res: Response) {
 
     // Borrar archivo temporal
     fs.unlink(archivo.path, (err) => {
-      if (err) console.error("Error borrando archivo temporal:", err);
+      if (err) console.error('Error borrando archivo temporal:', err);
     });
 
     // Actualizar la foto en la base de datos
@@ -32,7 +32,7 @@ export async function actualizarFotoPerfil(req: Request, res: Response) {
     const user = await getUserById(usuarioId);
 
     if (!user) {
-      return res.status(404).json({ success: false, message: "Usuario no encontrado" });
+      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
     }
 
     // 🔥 Generar un nuevo token con la foto actualizada
@@ -41,21 +41,20 @@ export async function actualizarFotoPerfil(req: Request, res: Response) {
       user.name,
       user.email,
       user.role,
-      user.url_photo      // foto nueva
+      user.url_photo, // foto nueva
     );
 
     return res.status(200).json({
       success: true,
       message: 'Foto actualizada.',
       url: urlFoto,
-      token: newToken     // 🔥 enviar token actualizado
+      token: newToken, // 🔥 enviar token actualizado
     });
-
   } catch (error) {
     console.error('Error:', error);
     return res.status(500).json({
       success: false,
-      message: 'Error interno al subir foto.'
+      message: 'Error interno al subir foto.',
     });
   }
 }

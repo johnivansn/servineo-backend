@@ -6,7 +6,7 @@ export async function verifyTOTPController(req: Request, res: Response) {
   const { email, code } = req.body;
 
   if (!email || !code) {
-    return res.status(400).json({ status: "error", message: "Email o código no proporcionado" });
+    return res.status(400).json({ status: 'error', message: 'Email o código no proporcionado' });
   }
 
   try {
@@ -14,13 +14,11 @@ export async function verifyTOTPController(req: Request, res: Response) {
 
     // ✅ En caso de éxito, devuelve mismo formato que login con Google
     return res.json(result);
-
   } catch (err: any) {
-
     // Devuelve mismo formato de error que Google Login
     return res.status(400).json({
-      status: "error",
-      message: err.message || "Error al verificar código TOTP"
+      status: 'error',
+      message: err.message || 'Error al verificar código TOTP',
     });
   }
 }

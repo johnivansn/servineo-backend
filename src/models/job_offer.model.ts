@@ -65,7 +65,7 @@ const jobOfferSchema = new Schema<IJobOffer>(
   {
     timestamps: true,
     collection: 'jobs',
-  }
+  },
 );
 
 jobOfferSchema.index({ fixerId: 1 });

@@ -43,12 +43,10 @@ export async function getModalFormAppointment(req: Request, res: Response) {
     const { fixer_id, requester_id, appointment_date, start_hour } = req.query;
     console.log(req.query);
     if (!fixer_id || !requester_id || !appointment_date || !start_hour) {
-      return res
-        .status(400)
-        .json({
-          message:
-            'Missing parameter: required fixer_id, requester_id, appointment_date and start_hour',
-        });
+      return res.status(400).json({
+        message:
+          'Missing parameter: required fixer_id, requester_id, appointment_date and start_hour',
+      });
     }
     if (
       typeof fixer_id !== 'string' ||
@@ -105,11 +103,9 @@ export async function getMeetingStatus(req: Request, res: Response) {
     const { id_requester, id_fixer, selected_date, starting_time } = req.query;
     console.log(req.query);
     if (!id_requester || !id_fixer || !selected_date || !starting_time) {
-      return res
-        .status(400)
-        .json({
-          message: 'Missing parameters: required requester id, fixer id, date or starting hour',
-        });
+      return res.status(400).json({
+        message: 'Missing parameters: required requester id, fixer id, date or starting hour',
+      });
     }
     if (
       typeof id_requester !== 'string' ||
@@ -128,14 +124,12 @@ export async function getMeetingStatus(req: Request, res: Response) {
     console.log(name, status);
     return res.status(200).json({ message: 'Meeting status successfully accessed', name, status });
   } catch (err) {
-    return res
-      .status(500)
-      .json({
-        message: 'Error updating appointment data',
-        name: '',
-        status: '',
-        error: (err as Error).message,
-      });
+    return res.status(500).json({
+      message: 'Error updating appointment data',
+      name: '',
+      status: '',
+      error: (err as Error).message,
+    });
   }
 }
 

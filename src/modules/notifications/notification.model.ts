@@ -33,13 +33,13 @@ const NotificationSchema = new Schema<INotification>(
   {
     timestamps: true, // Dejamos que Mongoose maneje createdAt y updatedAt
     strict: false,
-  }
+  },
 );
 
 // Modelo de Mongoose
 const Notification: Model<INotification> = mongoose.model<INotification>(
   'Notification',
-  NotificationSchema
+  NotificationSchema,
 );
 
 export default Notification;

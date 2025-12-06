@@ -3,11 +3,11 @@ import { Schema, model, models, InferSchemaType } from 'mongoose';
 const ProviderPaymentMethodSchema = new Schema(
   {
     providerId: { type: String, index: true, required: true },
-    method: { 
-      type: String, 
-      enum: ['qr', 'transfer', 'card'], 
-      required: true, 
-      default: 'qr' 
+    method: {
+      type: String,
+      enum: ['qr', 'transfer', 'card'],
+      required: true,
+      default: 'qr',
     },
     qrImageUrl: { type: String, required: false }, // enlace al QR (Drive u otro)
     accountDisplay: { type: String, required: true }, // “Banco · Titular · **”

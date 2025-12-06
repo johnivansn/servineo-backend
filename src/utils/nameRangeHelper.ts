@@ -1,8 +1,23 @@
 export const isValidRange = (range: string): boolean => {
   const validRanges = [
-    'A-C', 'D-F', 'G-I', 'J-L', 'M-Ñ', 'O-Q', 'R-T', 'U-W', 'X-Z',
-    'De (A-C)', 'De (D-F)', 'De (G-I)', 'De (J-L)', 'De (M-Ñ)', 
-    'De (O-Q)', 'De (R-T)', 'De (U-W)', 'De (X-Z)'
+    'A-C',
+    'D-F',
+    'G-I',
+    'J-L',
+    'M-Ñ',
+    'O-Q',
+    'R-T',
+    'U-W',
+    'X-Z',
+    'De (A-C)',
+    'De (D-F)',
+    'De (G-I)',
+    'De (J-L)',
+    'De (M-Ñ)',
+    'De (O-Q)',
+    'De (R-T)',
+    'De (U-W)',
+    'De (X-Z)',
   ];
   const cleanRange = extractRangeLetters(range);
   return validRanges.includes(cleanRange) || validRanges.includes(range);

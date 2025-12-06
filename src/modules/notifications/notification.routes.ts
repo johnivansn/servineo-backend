@@ -11,14 +11,10 @@ router.get('/', requireAuth, NotificationController.getAllNotificationsControlle
 router.get(
   '/tipo/:notification_type',
   requireAuth,
-  NotificationController.getNotificationsByTypeController
+  NotificationController.getNotificationsByTypeController,
 );
 
 // PATCH /api/notifications/:id/leido - Marca una notificación como leída
-router.patch(
-  '/:id/leido',
-  requireAuth,
-  NotificationController.markNotificationAsReadController
-);
+router.patch('/:id/leido', requireAuth, NotificationController.markNotificationAsReadController);
 
 export default router;

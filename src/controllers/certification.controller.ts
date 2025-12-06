@@ -11,7 +11,7 @@ const isValidObjectId = (id?: string) => {
  * ---------------------------------------------------
  * MÉTODO: POST
  * RUTA:   /api/certifications
- * BODY:   
+ * BODY:
  * {
  * "fixerId": "64b...",       // (Requerido) ID del usuario/fixer
  * "name": "Curso JS",        // (Requerido) Nombre de la certificación
@@ -24,12 +24,13 @@ const isValidObjectId = (id?: string) => {
  */
 export const createCertification = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { fixerId, name, institution, issueDate, expiryDate, credentialId, credentialUrl } = req.body;
+    const { fixerId, name, institution, issueDate, expiryDate, credentialId, credentialUrl } =
+      req.body;
 
     if (!fixerId || !name || !institution || !issueDate) {
       res.status(400).json({
         success: false,
-        message: 'Faltan campos requeridos: fixerId, name, institution, issueDate'
+        message: 'Faltan campos requeridos: fixerId, name, institution, issueDate',
       });
       return;
     }
@@ -47,20 +48,21 @@ export const createCertification = async (req: Request, res: Response): Promise<
       issueDate: parsedIssueDate,
       expiryDate: expiryDate ? new Date(expiryDate) : undefined,
       credentialId,
-      credentialUrl
+      credentialUrl,
     });
 
     await certification.save();
 
     res.status(201).json({
       success: true,
-      message: "Certificación creada exitosamente",
+      message: 'Certificación creada exitosamente',
       data: certification,
     });
-
   } catch (error: any) {
     console.error('Error creating certification:', error);
-    res.status(500).json({ success: false, message: 'Error interno del servidor', error: error.message });
+    res
+      .status(500)
+      .json({ success: false, message: 'Error interno del servidor', error: error.message });
   }
 };
 
@@ -81,18 +83,19 @@ export const getCertificationsByFixerId = async (req: Request, res: Response) =>
     }
 
     const certifications = await Certification.find({
-      fixerId: new Types.ObjectId(fixerId)
+      fixerId: new Types.ObjectId(fixerId),
     }).sort({ createdAt: -1 });
 
     return res.status(200).json({
       success: true,
       count: certifications.length,
-      data: certifications
+      data: certifications,
     });
-
   } catch (error: any) {
     console.error('Error fetching certifications:', error);
-    return res.status(500).json({ success: false, message: 'Error al obtener certificaciones', error: error.message });
+    return res
+      .status(500)
+      .json({ success: false, message: 'Error al obtener certificaciones', error: error.message });
   }
 };
 
@@ -119,7 +122,9 @@ export const getCertificationById = async (req: Request, res: Response) => {
     return res.status(200).json({ success: true, data: certification });
   } catch (error: any) {
     console.error('Error fetching certification:', error);
-    return res.status(500).json({ success: false, message: 'Error al obtener la certificación', error: error.message });
+    return res
+      .status(500)
+      .json({ success: false, message: 'Error al obtener la certificación', error: error.message });
   }
 };
 
@@ -154,15 +159,14 @@ export const updateCertification = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       message: 'Certificación actualizada exitosamente',
-      data: updatedCertification
+      data: updatedCertification,
     });
-
   } catch (error: any) {
     console.error('Error updating certification:', error);
     return res.status(500).json({
       success: false,
       message: 'Error al actualizar la certificación',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -193,15 +197,14 @@ export const deleteCertification = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       success: true,
-      message: 'Certificación eliminada exitosamente'
+      message: 'Certificación eliminada exitosamente',
     });
-
   } catch (error: any) {
     console.error('Error deleting certification:', error);
     return res.status(500).json({
       success: false,
       message: 'Error al eliminar la certificación',
-      error: error.message
+      error: error.message,
     });
   }
 };

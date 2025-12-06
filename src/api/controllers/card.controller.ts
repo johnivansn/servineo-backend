@@ -1,9 +1,9 @@
-import type { Request, Response } from "express";
-import Stripe from "stripe";
-import Card from "../../models/card.model";
-import {User} from "../../models/user.model";
+import type { Request, Response } from 'express';
+import Stripe from 'stripe';
+import Card from '../../models/card.model';
+import { User } from '../../models/user.model';
 import 'dotenv/config';
- 
+
 // Validar que la clave de Stripe existe
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('❌ STRIPE_SECRET_KEY no está definida en las variables de entorno');
@@ -13,7 +13,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const createCard = async (req: Request, res: Response) => {
   try {
-    console.log("➡️ createCard called with body:", req.body);
+    console.log('➡️ createCard called with body:', req.body);
 
     const { userId, paymentMethodId, saveCard, cardholderName } = req.body;
 
@@ -21,15 +21,19 @@ export const createCard = async (req: Request, res: Response) => {
     console.log(`🔍 Buscando usuario con ID: ${userId}`);
     const user = await User.findById(userId);
     if (!user) {
-      console.log("❌ Usuario no encontrado");
-      return res.status(404).json({ error: "User not found" });
+      console.log('❌ Usuario no encontrado');
+      return res.status(404).json({ error: 'User not found' });
     }
-    console.log("✅ Usuario encontrado:", { email: user.email, name: user.name, stripeCustomerId: user.stripeCustomerId });
+    console.log('✅ Usuario encontrado:', {
+      email: user.email,
+      name: user.name,
+      stripeCustomerId: user.stripeCustomerId,
+    });
 
     let customerId = user.stripeCustomerId;
 
     if (!customerId) {
-      console.log("⚡ No hay Stripe Customer, creando uno nuevo...");
+      console.log('⚡ No hay Stripe Customer, creando uno nuevo...');
       const customer = await stripe.customers.create({
         email: user.email,
         name: user.name,
@@ -37,14 +41,14 @@ export const createCard = async (req: Request, res: Response) => {
       customerId = customer.id;
       user.stripeCustomerId = customerId;
       await user.save();
-      console.log("✅ Customer creado en Stripe:", customerId);
+      console.log('✅ Customer creado en Stripe:', customerId);
     } else {
-      console.log("🔄 Validando que el Customer existe en Stripe:", customerId);
+      console.log('🔄 Validando que el Customer existe en Stripe:', customerId);
       try {
         await stripe.customers.retrieve(customerId);
-        console.log("✅ Customer existe en Stripe");
+        console.log('✅ Customer existe en Stripe');
       } catch (error) {
-        console.log("⚠️ Customer no encontrado en Stripe, creando uno nuevo...");
+        console.log('⚠️ Customer no encontrado en Stripe, creando uno nuevo...');
         const customer = await stripe.customers.create({
           email: user.email,
           name: user.name,
@@ -52,19 +56,19 @@ export const createCard = async (req: Request, res: Response) => {
         customerId = customer.id;
         user.stripeCustomerId = customerId;
         await user.save();
-        console.log("✅ Nuevo Customer creado en Stripe:", customerId);
+        console.log('✅ Nuevo Customer creado en Stripe:', customerId);
       }
     }
 
     // ⿣ Adjuntar PaymentMethod al Customer
-    console.log("🔗 Adjuntando PaymentMethod al Customer:", paymentMethodId);
+    console.log('🔗 Adjuntando PaymentMethod al Customer:', paymentMethodId);
     const paymentMethod = await stripe.paymentMethods.attach(paymentMethodId, {
       customer: customerId,
     });
-    console.log("✅ PaymentMethod adjuntado:", paymentMethod.id);
+    console.log('✅ PaymentMethod adjuntado:', paymentMethod.id);
 
     if (saveCard) {
-      console.log("💾 Guardando PaymentMethod como default y registrando en DB...");
+      console.log('💾 Guardando PaymentMethod como default y registrando en DB...');
       await stripe.customers.update(customerId, {
         invoice_settings: { default_payment_method: paymentMethod.id },
       });
@@ -80,33 +84,32 @@ export const createCard = async (req: Request, res: Response) => {
         cardholderName,
       });
 
-      console.log("✅ Tarjeta guardada en MongoDB:", newCard);
+      console.log('✅ Tarjeta guardada en MongoDB:', newCard);
       return res.json(newCard);
     }
 
     // ⿥ Retornar mensaje si no se guardó
-    console.log("ℹ️ Tarjeta agregada para pago, pero no guardada");
-    res.json({ message: "Tarjeta agregada para pago, no guardada" });
-
+    console.log('ℹ️ Tarjeta agregada para pago, pero no guardada');
+    res.json({ message: 'Tarjeta agregada para pago, no guardada' });
   } catch (error) {
-    console.error("❌ Error createCard:", error);
+    console.error('❌ Error createCard:', error);
     res.status(500).json({ error: (error as Error).message });
   }
 };
 
 export const listCards = async (req: Request, res: Response) => {
   try {
-    console.log("➡️ listCards called with query:", req.query);
+    console.log('➡️ listCards called with query:', req.query);
     const { userId } = req.query;
     if (!userId) {
       return res.status(400).json({ error: 'userId es requerido' });
     }
 
     const cards = await Card.find({ userId });
-    console.log("✅ Tarjetas encontradas:", cards);
+    console.log('✅ Tarjetas encontradas:', cards);
     res.json(cards);
   } catch (error) {
-    console.error("❌ Error listCards:", error);
+    console.error('❌ Error listCards:', error);
     res.status(500).json({ error: (error as Error).message });
   }
 };

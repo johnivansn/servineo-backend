@@ -1,12 +1,22 @@
 import { Request, Response } from 'express';
 import {
-  generateSecret, buildOtpAuth, makeQrDataUrl,
-  saveTempSecretForUser, getTempSecretForUser,
-  verifyToken, activateTwoFactorForUser, genRecoveryCodes, disableTwoFactorForUser
+  generateSecret,
+  buildOtpAuth,
+  makeQrDataUrl,
+  saveTempSecretForUser,
+  getTempSecretForUser,
+  verifyToken,
+  activateTwoFactorForUser,
+  genRecoveryCodes,
+  disableTwoFactorForUser,
 } from '../../../services/userManagement/2fa.service';
 
 // 🆕 Importar sistema de intentos (necesitarás crear este archivo)
-import { isLocked, recordFailedAttempt, resetAttempts } from '../../../services/userManagement/2fa.attempts';
+import {
+  isLocked,
+  recordFailedAttempt,
+  resetAttempts,
+} from '../../../services/userManagement/2fa.attempts';
 
 export async function generate(req: Request, res: Response) {
   try {
@@ -50,7 +60,7 @@ export async function verify(req: Request, res: Response) {
     const ok = verifyToken(secret, token);
     if (!ok) {
       const info = await recordFailedAttempt(user.id);
-      
+
       if (info.locked) {
         return res.status(423).json({
           message: `Demasiados intentos. Bloqueado por ${process.env.TOTP_LOCK_MINUTES || 5} minutos.`,
@@ -58,7 +68,7 @@ export async function verify(req: Request, res: Response) {
           attempts: info.attempts,
         });
       }
-      
+
       return res.status(400).json({
         message: 'Token inválido',
         attemptsLeft: info.attemptsLeft,
@@ -70,7 +80,7 @@ export async function verify(req: Request, res: Response) {
     const codes = genRecoveryCodes(8);
     await activateTwoFactorForUser(user.id, secret, codes);
     await resetAttempts(user.id);
-    
+
     return res.json({ recoveryCodes: codes });
   } catch (err) {
     console.error('ERROR /2fa/verify', err);

@@ -1,6 +1,6 @@
-import { JobOfferRepository } from "../../types/newJobOfferRepository";
-import { JobOfferModel, IJobOffer } from "../../models/newJobOffer.model";
-import { CreateOfferInput } from "../../types/newOfferInput";
+import { JobOfferRepository } from '../../types/newJobOfferRepository';
+import { JobOfferModel, IJobOffer } from '../../models/newJobOffer.model';
+import { CreateOfferInput } from '../../types/newOfferInput';
 
 export class JobOfferMongoRepository implements JobOfferRepository {
   async save(offer: CreateOfferInput): Promise<{ insertedId: string }> {
@@ -30,11 +30,7 @@ export class JobOfferMongoRepository implements JobOfferRepository {
 
   async update(offerId: string, data: Partial<CreateOfferInput>): Promise<IJobOffer | null> {
     try {
-      return await JobOfferModel.findByIdAndUpdate(
-        offerId,
-        { $set: data },
-        { new: true }
-      );
+      return await JobOfferModel.findByIdAndUpdate(offerId, { $set: data }, { new: true });
     } catch (error: any) {
       throw new Error(`Error al actualizar oferta: ${error.message}`);
     }

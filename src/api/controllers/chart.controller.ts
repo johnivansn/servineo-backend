@@ -1,7 +1,11 @@
 import { Request, Response } from 'express';
 import { Activity } from '../../models/activities.model';
 
-const getSessionChartByType = async (req: Request, res: Response, sessionType: 'session_start' | 'session_end') => {
+const getSessionChartByType = async (
+  req: Request,
+  res: Response,
+  sessionType: 'session_start' | 'session_end',
+) => {
   try {
     const { date, enddate } = req.query;
 
@@ -36,16 +40,16 @@ const getSessionChartByType = async (req: Request, res: Response, sessionType: '
     if (!enddate) {
       // Agrupar por hora
       groupStage = {
-        _id: { hour: { $hour: "$date" } },
+        _id: { hour: { $hour: '$date' } },
         count: { $sum: 1 },
       };
     } else {
       // Agrupar por día
       groupStage = {
         _id: {
-          year: { $year: "$date" },
-          month: { $month: "$date" },
-          day: { $dayOfMonth: "$date" },
+          year: { $year: '$date' },
+          month: { $month: '$date' },
+          day: { $dayOfMonth: '$date' },
         },
         count: { $sum: 1 },
       };
@@ -54,22 +58,21 @@ const getSessionChartByType = async (req: Request, res: Response, sessionType: '
     const data = await Activity.aggregate([
       { $match: matchStage },
       { $group: groupStage },
-      { $sort: { "_id": 1 } }
+      { $sort: { _id: 1 } },
     ]);
 
     return res.json({
       success: true,
       from: startDate,
       to: rangeEnd,
-      groupedBy: enddate ? "day" : "hour",
+      groupedBy: enddate ? 'day' : 'hour',
       data,
     });
-
   } catch (error) {
     console.error(`Error en getSessionChart (${sessionType}):`, error);
     return res.status(500).json({
       success: false,
-      message: "Error interno del servidor",
+      message: 'Error interno del servidor',
     });
   }
 };

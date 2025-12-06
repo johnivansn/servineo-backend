@@ -30,9 +30,7 @@ export function filterOffers(options?: FilterOptions): any {
   // Procesar ciudades: pueden venir como single city o como array cities
   if (options.cities && options.cities.length > 0) {
     // Multiples ciudades: usar $in con logica OR
-    const normalizedCities = options.cities
-      .map((c) => validateAndNormalizeCity(c))
-      .filter(Boolean);
+    const normalizedCities = options.cities.map((c) => validateAndNormalizeCity(c)).filter(Boolean);
     if (normalizedCities.length > 0) {
       filters.city = { $in: normalizedCities };
     }

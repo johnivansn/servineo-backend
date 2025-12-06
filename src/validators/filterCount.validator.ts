@@ -27,7 +27,7 @@ export class FilterCountValidator {
     cities: CountObject,
     categories: CountObject,
     ratings: CountObject,
-    total: number
+    total: number,
   ): ValidationResult {
     const errors: string[] = [];
     const warnings: string[] = [];
@@ -50,25 +50,19 @@ export class FilterCountValidator {
     this.validateEmptyKeys('ratings', ratings, errors);
 
     // 4. ⭐ NUEVO: Validar que la suma coincida con el total (TASK PENDIENTE)
-    const sumValidation = this.validateSumMatchesTotal(
-      fixers,
-      cities,
-      categories,
-      ratings,
-      total
-    );
-    
+    const sumValidation = this.validateSumMatchesTotal(fixers, cities, categories, ratings, total);
+
     errors.push(...sumValidation.errors);
     warnings.push(...sumValidation.warnings);
 
     // 5. Advertencia si total es 0 pero hay conteos
     if (total === 0) {
-      const hasAnyCounts = 
+      const hasAnyCounts =
         Object.keys(fixers).length > 0 ||
         Object.keys(cities).length > 0 ||
         Object.keys(categories).length > 0 ||
         Object.keys(ratings).length > 0;
-      
+
       if (hasAnyCounts) {
         warnings.push('Total is 0 but individual counts exist');
       }
@@ -90,10 +84,10 @@ export class FilterCountValidator {
   /**
    * ⭐ VALIDACIÓN PRINCIPAL DEL TASK PENDIENTE:
    * Verifica que la suma de conteos de cada filtro coincida con el total
-   * 
+   *
    * IMPORTANTE: Cuando hay filtros activos, las sumas PUEDEN exceder el total
    * porque cada tipo de filtro se calcula sin su propio filtro pero con los demás.
-   * 
+   *
    * Por ejemplo:
    * - Total con filtros: 45 ofertas
    * - Cities sin filtro de city: puede sumar más porque incluye todas las ciudades
@@ -104,7 +98,7 @@ export class FilterCountValidator {
     cities: CountObject,
     categories: CountObject,
     ratings: CountObject,
-    total: number
+    total: number,
   ): {
     errors: string[];
     warnings: string[];
@@ -135,68 +129,72 @@ export class FilterCountValidator {
 
     // ⭐ REGLA 1: Validar integridad de datos básica
     // Solo marcamos ERROR si hay inconsistencias graves que indiquen corrupción
-    
+
     // Si el total es 0, ninguna suma debería tener valores
     if (total === 0 && (fixersSum > 0 || citiesSum > 0 || categoriesSum > 0 || ratingsSum > 0)) {
       errors.push(
-        `Total is 0 but filter sums are not zero (fixers: ${fixersSum}, cities: ${citiesSum}, categories: ${categoriesSum}, ratings: ${ratingsSum})`
+        `Total is 0 but filter sums are not zero (fixers: ${fixersSum}, cities: ${citiesSum}, categories: ${categoriesSum}, ratings: ${ratingsSum})`,
       );
     }
 
     // Si hay total pero todas las sumas son 0, hay un problema
-    if (total > 0 && fixersSum === 0 && citiesSum === 0 && categoriesSum === 0 && ratingsSum === 0) {
-      errors.push(
-        `Total is ${total} but all filter counts are zero - data inconsistency detected`
-      );
+    if (
+      total > 0 &&
+      fixersSum === 0 &&
+      citiesSum === 0 &&
+      categoriesSum === 0 &&
+      ratingsSum === 0
+    ) {
+      errors.push(`Total is ${total} but all filter counts are zero - data inconsistency detected`);
     }
 
     // ⚠️ WARNINGS: Alertar sobre discrepancias que pueden ser normales pero merecen atención
-    
+
     // Si una suma excede significativamente el total, puede indicar:
     // 1. Filtros activos (normal)
     // 2. Datos duplicados (problema)
     // 3. Lógica de conteo incorrecta (problema)
-    
+
     const SIGNIFICANT_EXCEEDANCE = 5.0; // 500% - solo para casos extremos
-    
+
     if (total > 0) {
       if (fixersSum > total * SIGNIFICANT_EXCEEDANCE) {
         warnings.push(
-          `Fixers sum (${fixersSum}) is ${(fixersSum/total).toFixed(1)}x the total (${total}) - verify data integrity`
+          `Fixers sum (${fixersSum}) is ${(fixersSum / total).toFixed(1)}x the total (${total}) - verify data integrity`,
         );
       } else if (fixersSum > total) {
         warnings.push(
-          `Fixers sum (${fixersSum}) exceeds total (${total}) by ${((fixersSum/total - 1) * 100).toFixed(1)}%`
+          `Fixers sum (${fixersSum}) exceeds total (${total}) by ${((fixersSum / total - 1) * 100).toFixed(1)}%`,
         );
       }
 
       if (citiesSum > total * SIGNIFICANT_EXCEEDANCE) {
         warnings.push(
-          `Cities sum (${citiesSum}) is ${(citiesSum/total).toFixed(1)}x the total (${total}) - verify data integrity`
+          `Cities sum (${citiesSum}) is ${(citiesSum / total).toFixed(1)}x the total (${total}) - verify data integrity`,
         );
       } else if (citiesSum > total) {
         warnings.push(
-          `Cities sum (${citiesSum}) exceeds total (${total}) by ${((citiesSum/total - 1) * 100).toFixed(1)}%`
+          `Cities sum (${citiesSum}) exceeds total (${total}) by ${((citiesSum / total - 1) * 100).toFixed(1)}%`,
         );
       }
 
       if (categoriesSum > total * SIGNIFICANT_EXCEEDANCE) {
         warnings.push(
-          `Categories sum (${categoriesSum}) is ${(categoriesSum/total).toFixed(1)}x the total (${total}) - verify data integrity`
+          `Categories sum (${categoriesSum}) is ${(categoriesSum / total).toFixed(1)}x the total (${total}) - verify data integrity`,
         );
       } else if (categoriesSum > total) {
         warnings.push(
-          `Categories sum (${categoriesSum}) exceeds total (${total}) by ${((categoriesSum/total - 1) * 100).toFixed(1)}%`
+          `Categories sum (${categoriesSum}) exceeds total (${total}) by ${((categoriesSum / total - 1) * 100).toFixed(1)}%`,
         );
       }
 
       if (ratingsSum > total * SIGNIFICANT_EXCEEDANCE) {
         warnings.push(
-          `Ratings sum (${ratingsSum}) is ${(ratingsSum/total).toFixed(1)}x the total (${total}) - verify data integrity`
+          `Ratings sum (${ratingsSum}) is ${(ratingsSum / total).toFixed(1)}x the total (${total}) - verify data integrity`,
         );
       } else if (ratingsSum > total) {
         warnings.push(
-          `Ratings sum (${ratingsSum}) exceeds total (${total}) by ${((ratingsSum/total - 1) * 100).toFixed(1)}%`
+          `Ratings sum (${ratingsSum}) exceeds total (${total}) by ${((ratingsSum / total - 1) * 100).toFixed(1)}%`,
         );
       }
     }
@@ -205,22 +203,23 @@ export class FilterCountValidator {
     // Si las sumas están MUY por debajo del total, puede indicar datos faltantes
     const MINIMUM_COVERAGE = 0.5; // 50%
 
-    if (total > 10) { // Solo validar si hay suficientes datos
+    if (total > 10) {
+      // Solo validar si hay suficientes datos
       if (fixersSum > 0 && fixersSum < total * MINIMUM_COVERAGE) {
         warnings.push(
-          `Fixers sum (${fixersSum}) is only ${((fixersSum/total) * 100).toFixed(1)}% of total (${total}) - possible missing data`
+          `Fixers sum (${fixersSum}) is only ${((fixersSum / total) * 100).toFixed(1)}% of total (${total}) - possible missing data`,
         );
       }
 
       if (citiesSum > 0 && citiesSum < total * MINIMUM_COVERAGE) {
         warnings.push(
-          `Cities sum (${citiesSum}) is only ${((citiesSum/total) * 100).toFixed(1)}% of total (${total}) - possible missing data`
+          `Cities sum (${citiesSum}) is only ${((citiesSum / total) * 100).toFixed(1)}% of total (${total}) - possible missing data`,
         );
       }
 
       if (categoriesSum > 0 && categoriesSum < total * MINIMUM_COVERAGE) {
         warnings.push(
-          `Categories sum (${categoriesSum}) is only ${((categoriesSum/total) * 100).toFixed(1)}% of total (${total}) - possible missing data`
+          `Categories sum (${categoriesSum}) is only ${((categoriesSum / total) * 100).toFixed(1)}% of total (${total}) - possible missing data`,
         );
       }
     }
@@ -242,7 +241,7 @@ export class FilterCountValidator {
     name: string,
     counts: CountObject,
     errors: string[],
-    warnings: string[]
+    warnings: string[],
   ): void {
     const keys = Object.keys(counts);
     const seenKeys = new Set<string>();
@@ -277,11 +276,7 @@ export class FilterCountValidator {
   /**
    * Valida que no haya claves vacías o inválidas
    */
-  private static validateEmptyKeys(
-    name: string,
-    counts: CountObject,
-    errors: string[]
-  ): void {
+  private static validateEmptyKeys(name: string, counts: CountObject, errors: string[]): void {
     for (const key of Object.keys(counts)) {
       if (!key || key.trim() === '') {
         errors.push(`${name} contains empty or whitespace-only key`);
@@ -295,7 +290,7 @@ export class FilterCountValidator {
   private static checkUnusuallyHighValues(
     counts: CountObject,
     name: string,
-    warnings: string[]
+    warnings: string[],
   ): void {
     const values = Object.values(counts);
     if (values.length === 0) return;
@@ -306,7 +301,7 @@ export class FilterCountValidator {
     // Si el máximo es más de 100 veces el promedio, podría ser un error
     if (max > avg * 100 && avg > 0) {
       warnings.push(
-        `${name} has unusually high value (${max}) compared to average (${avg.toFixed(2)})`
+        `${name} has unusually high value (${max}) compared to average (${avg.toFixed(2)})`,
       );
     }
   }
@@ -318,7 +313,7 @@ export class FilterCountValidator {
     fixers: CountObject,
     cities: CountObject,
     categories: CountObject,
-    total: number
+    total: number,
   ): ValidationResult {
     const errors: string[] = [];
     const warnings: string[] = [];
@@ -326,14 +321,14 @@ export class FilterCountValidator {
     // La suma de conteos individuales puede ser diferente al total
     // debido a agregaciones, pero podemos advertir sobre grandes discrepancias
     const fixerSum = Object.values(fixers).reduce((a, b) => a + b, 0);
-    
+
     if (fixerSum > 0 && total > 0) {
       const ratio = fixerSum / total;
-      
+
       // Si la suma de fixers es muy diferente al total, advertir
       if (ratio > 1.5 || ratio < 0.5) {
         warnings.push(
-          `Fixer count sum (${fixerSum}) differs significantly from total (${total}). Ratio: ${ratio.toFixed(2)}`
+          `Fixer count sum (${fixerSum}) differs significantly from total (${total}). Ratio: ${ratio.toFixed(2)}`,
         );
       }
     }

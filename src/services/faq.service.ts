@@ -2,10 +2,7 @@ import { Types } from 'mongoose';
 import { FAQModel, IFAQ } from '../models/faq.model';
 
 export async function getAllFAQs(): Promise<IFAQ[]> {
-  const faqs = await FAQModel.find({ activo: true })
-    .sort({ orden: 1, createdAt: 1 })
-    .lean()
-    .exec();
+  const faqs = await FAQModel.find({ activo: true }).sort({ orden: 1, createdAt: 1 }).lean().exec();
 
   return faqs as unknown as IFAQ[];
 }

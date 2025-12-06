@@ -1,4 +1,3 @@
-
 export type WalletFlags = {
   /** true si 0 < balance <= lowBalanceThreshold */
   needsLowAlert: boolean;
@@ -31,7 +30,7 @@ export type ComputeFlagsResult = {
   /** cambió algo relevante vs prevFlags */
   changed: boolean;
   /** estado derivado del postBalance */
-  state: "ok" | "low" | "critical";
+  state: 'ok' | 'low' | 'critical';
   /** hubo cruce de umbral en esta operación */
   crossed: boolean;
 };
@@ -57,8 +56,7 @@ export function computeWalletFlags(p: ComputeFlagsParams): ComputeFlagsResult {
   const post = Number(p.postBalance || 0);
   const thr = Number(p.lowBalanceThreshold || 0);
 
-  const state: "ok" | "low" | "critical" =
-    post <= 0 ? "critical" : post <= thr ? "low" : "ok";
+  const state: 'ok' | 'low' | 'critical' = post <= 0 ? 'critical' : post <= thr ? 'low' : 'ok';
 
   const crossedToCritical = pre > 0 && post <= 0;
   const crossedToLow = pre > thr && post <= thr;
@@ -71,14 +69,14 @@ export function computeWalletFlags(p: ComputeFlagsParams): ComputeFlagsResult {
   let updatedAt = prev.updatedAt;
   let cooldownUntil = prev.cooldownUntil;
 
-  if (state === "critical") {
+  if (state === 'critical') {
     if (crossedToCritical || !inCooldown) {
       needsCriticalAlert = true;
       needsLowAlert = false;
       updatedAt = now;
       cooldownUntil = new Date(now.getTime() + cooldownMs);
     }
-  } else if (state === "low") {
+  } else if (state === 'low') {
     if (crossedToLow || !inCooldown) {
       needsLowAlert = true;
       needsCriticalAlert = false;

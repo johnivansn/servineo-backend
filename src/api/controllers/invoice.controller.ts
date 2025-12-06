@@ -46,7 +46,7 @@ export const getInvoices = async (req: Request, res: Response, next: NextFunctio
       .select('transactionId requesterName date total currency status requesterId')
       .sort({ date: -1 })) as InvoiceDocument[];
 
-    const formattedInvoices = invoices.map(invoice => ({
+    const formattedInvoices = invoices.map((invoice) => ({
       id: invoice._id.toString(),
       transactionId: invoice.transactionId,
       requesterName: invoice.requesterName,

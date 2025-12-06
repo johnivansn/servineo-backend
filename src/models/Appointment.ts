@@ -56,7 +56,7 @@ const appointment_schema = new mongoose.Schema(
       enum: ['cancelled', 'booked'],
       required: true,
       unique: false,
-      default: 'booked'
+      default: 'booked',
     },
     display_name_location: {
       type: String,
@@ -72,24 +72,24 @@ const appointment_schema = new mongoose.Schema(
     },
     cancelled_fixer: {
       type: Boolean,
-      default: false
+      default: false,
     },
     reprogram_reason: {
       type: String,
       default: '',
       required: false,
-      unique: false
+      unique: false,
     },
     googleEventId: {
       type: String,
       required: false,
-      unique: false
+      unique: false,
     },
     mail: {
       type: [String], // Array de strings
       required: false,
-      unique: false
-    }
+      unique: false,
+    },
   },
   { timestamps: true },
 );

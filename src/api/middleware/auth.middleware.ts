@@ -11,7 +11,7 @@ const UNAUTHORIZED_RESPONSE = { success: false, message: 'No autorizado' };
 export function requireAuth(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Response | void {
   try {
     const authHeader = req.headers.authorization || '';
@@ -28,7 +28,8 @@ export function requireAuth(
 
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload | string;
 
-    const userId = typeof decoded === 'string' ? decoded : decoded.sub || decoded.userId || decoded.id;
+    const userId =
+      typeof decoded === 'string' ? decoded : decoded.sub || decoded.userId || decoded.id;
 
     if (!userId) {
       return res.status(401).json(UNAUTHORIZED_RESPONSE);

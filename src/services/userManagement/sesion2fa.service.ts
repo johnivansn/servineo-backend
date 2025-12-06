@@ -8,7 +8,6 @@ interface TwoFactorStatus {
 }
 
 export async function checkTwoFactorStatusService(email: string): Promise<TwoFactorStatus> {
-
   if (!email) throw new Error('Email requerido');
 
   const client = await clientPromise;

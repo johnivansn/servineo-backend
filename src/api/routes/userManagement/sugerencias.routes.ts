@@ -1,6 +1,6 @@
-import { Router, Request, Response } from "express";
-import fetch from "node-fetch";
-import rateLimit from "express-rate-limit";
+import { Router, Request, Response } from 'express';
+import fetch from 'node-fetch';
+import rateLimit from 'express-rate-limit';
 
 const router = Router();
 
@@ -15,9 +15,9 @@ const nominatimLimiter = rateLimit({
 const cache = new Map<string, { ts: number; data: any }>();
 const CACHE_TTL = 60 * 1000;
 
-router.get("/nominatim", nominatimLimiter, async (req: Request, res: Response) => {
-  const q = String(req.query.q || "").trim();
-  if (!q) return res.status(400).json({ error: "Falta parámetro q" });
+router.get('/nominatim', nominatimLimiter, async (req: Request, res: Response) => {
+  const q = String(req.query.q || '').trim();
+  if (!q) return res.status(400).json({ error: 'Falta parámetro q' });
 
   const cacheKey = `nom:${q.toLowerCase()}`;
   const now = Date.now();
@@ -29,19 +29,19 @@ router.get("/nominatim", nominatimLimiter, async (req: Request, res: Response) =
 
   try {
     const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
-      q
+      q,
     )}&format=json&addressdetails=1&limit=5`;
 
     const r = await fetch(url, {
       headers: {
-        "User-Agent": "ServineoApp/1.0 (contacto@tudominio.com)",
-        "Referer": "http://localhost:3000/",
-        "Accept-Language": "es",
+        'User-Agent': 'ServineoApp/1.0 (contacto@tudominio.com)',
+        Referer: 'http://localhost:3000/',
+        'Accept-Language': 'es',
       },
     });
 
     if (!r.ok) {
-      const text = await r.text().catch(() => "");
+      const text = await r.text().catch(() => '');
       return res.status(502).json({ error: `Nominatim HTTP ${r.status}`, detail: text });
     }
 
@@ -50,8 +50,8 @@ router.get("/nominatim", nominatimLimiter, async (req: Request, res: Response) =
 
     return res.json(data);
   } catch (err: any) {
-    console.error("Error proxy Nominatim:", err);
-    return res.status(500).json({ error: "Error consultando Nominatim", detail: err?.message });
+    console.error('Error proxy Nominatim:', err);
+    return res.status(500).json({ error: 'Error consultando Nominatim', detail: err?.message });
   }
 });
 

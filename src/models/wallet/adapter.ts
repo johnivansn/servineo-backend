@@ -37,16 +37,14 @@ export function makeRawCollectionWalletAdapter(collectionName: string): WalletMo
       const _id = normalizeId(fixerId);
       const db = ensureDb();
       const filter: Record<string, unknown> = { _id };
-      const doc = await db
-        .collection<RawWalletDoc>(collectionName)
-        .findOne(filter, {
-          projection: {
-            'wallet.balance': 1,
-            'wallet.lowBalanceThreshold': 1,
-            'wallet.flags': 1,
-            'wallet.lastLowBalanceNotification': 1,
-          },
-        });
+      const doc = await db.collection<RawWalletDoc>(collectionName).findOne(filter, {
+        projection: {
+          'wallet.balance': 1,
+          'wallet.lowBalanceThreshold': 1,
+          'wallet.flags': 1,
+          'wallet.lastLowBalanceNotification': 1,
+        },
+      });
       if (!doc?.wallet) return null;
       return {
         balance: Number(doc.wallet.balance ?? 0),
@@ -61,9 +59,11 @@ export function makeRawCollectionWalletAdapter(collectionName: string): WalletMo
       const filter: Record<string, unknown> = { _id };
       const $set: RawWalletUpdateSet = { 'wallet.updatedAt': new Date() };
       if (patch.balance !== undefined) $set['wallet.balance'] = patch.balance;
-      if (patch.lowBalanceThreshold !== undefined) $set['wallet.lowBalanceThreshold'] = patch.lowBalanceThreshold;
+      if (patch.lowBalanceThreshold !== undefined)
+        $set['wallet.lowBalanceThreshold'] = patch.lowBalanceThreshold;
       if (patch.flags !== undefined) $set['wallet.flags'] = patch.flags;
-      if (patch.lastLowBalanceNotification !== undefined) $set['wallet.lastLowBalanceNotification'] = patch.lastLowBalanceNotification;
+      if (patch.lastLowBalanceNotification !== undefined)
+        $set['wallet.lastLowBalanceNotification'] = patch.lastLowBalanceNotification;
       await db.collection(collectionName).updateOne(filter, { $set });
     },
   };

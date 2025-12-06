@@ -43,7 +43,6 @@ interface MongoQuery {
 }
 
 export class FilterCountsService {
-
   static async getCounts(options: FilterCountsOptions = {}): Promise<FilterCounts> {
     const startTime = Date.now();
 
@@ -58,30 +57,26 @@ export class FilterCountsService {
       this.getCityCounts(baseQuery, options),
       this.getCategoryCounts(baseQuery, options),
       this.getRatingCounts(baseQuery, options),
-      PerformanceCount.measure(
-        'Total Count',
-        baseQuery,
-        () => {
-          const query = Offer.countDocuments(baseQuery);
-          
-          if (options.signal) {
-            options.signal.addEventListener('abort', () => {
-              console.log('🚫 Total count request aborted');
-            });
-          }
-          
-          return query;
+      PerformanceCount.measure('Total Count', baseQuery, () => {
+        const query = Offer.countDocuments(baseQuery);
+
+        if (options.signal) {
+          options.signal.addEventListener('abort', () => {
+            console.log('🚫 Total count request aborted');
+          });
         }
-      ),
+
+        return query;
+      }),
     ]);
 
     const duration = Date.now() - startTime;
-    
+
     if (options.signal?.aborted) {
       console.log('🚫 Request was aborted after completion');
       throw new Error('Request aborted');
     }
-    
+
     console.log(`📊 Filter Counts completed in ${duration}ms`);
 
     const validation = FilterCountValidator.validateCounts(
@@ -89,7 +84,7 @@ export class FilterCountsService {
       cityCounts,
       categoryCounts,
       ratingCounts,
-      total
+      total,
     );
 
     if (!validation.isValid) {
@@ -113,40 +108,41 @@ export class FilterCountsService {
   // ✅ NUEVA FUNCIÓN: Crear patrón regex que ignore acentos
   private static createAccentInsensitivePattern(text: string): string {
     const accentMap: Record<string, string> = {
-      'a': '[aáàäâ]',
-      'e': '[eéèëê]',
-      'i': '[iíìïî]',
-      'o': '[oóòöô]',
-      'u': '[uúùüû]',
-      'n': '[nñ]',
-      'A': '[AÁÀÄÂ]',
-      'E': '[EÉÈËÊ]',
-      'I': '[IÍÌÏÎ]',
-      'O': '[OÓÒÖÔ]',
-      'U': '[UÚÙÜÛ]',
-      'N': '[NÑ]',
+      a: '[aáàäâ]',
+      e: '[eéèëê]',
+      i: '[iíìïî]',
+      o: '[oóòöô]',
+      u: '[uúùüû]',
+      n: '[nñ]',
+      A: '[AÁÀÄÂ]',
+      E: '[EÉÈËÊ]',
+      I: '[IÍÌÏÎ]',
+      O: '[OÓÒÖÔ]',
+      U: '[UÚÙÜÛ]',
+      N: '[NÑ]',
     };
-    
-    return text.split('').map(char => {
-      // Si el carácter tiene una versión con acento, usar el patrón
-      if (accentMap[char]) {
-        return accentMap[char];
-      }
-      // Si el carácter YA ES un acento, encontrar su versión base
-      const base = Object.keys(accentMap).find(key => 
-        accentMap[key].includes(char)
-      );
-      if (base) {
-        return accentMap[base];
-      }
-      // Si no es ninguna vocal con acento, devolver tal cual
-      return char;
-    }).join('');
+
+    return text
+      .split('')
+      .map((char) => {
+        // Si el carácter tiene una versión con acento, usar el patrón
+        if (accentMap[char]) {
+          return accentMap[char];
+        }
+        // Si el carácter YA ES un acento, encontrar su versión base
+        const base = Object.keys(accentMap).find((key) => accentMap[key].includes(char));
+        if (base) {
+          return accentMap[base];
+        }
+        // Si no es ninguna vocal con acento, devolver tal cual
+        return char;
+      })
+      .join('');
   }
 
   private static async getRangeCounts(
     baseQuery: MongoQuery,
-    options: FilterCountsOptions
+    options: FilterCountsOptions,
   ): Promise<Record<string, number>> {
     const queryWithoutFixerFilter = { ...baseQuery };
     delete queryWithoutFixerFilter.fixerName;
@@ -169,7 +165,7 @@ export class FilterCountsService {
 
     const getRangeKey = (firstLetter: string): string => {
       const letter = firstLetter.toUpperCase();
-      
+
       if (['A', 'B', 'C'].includes(letter)) return 'De (A-C)';
       if (['D', 'E', 'F'].includes(letter)) return 'De (D-F)';
       if (['G', 'H', 'I'].includes(letter)) return 'De (G-I)';
@@ -179,7 +175,7 @@ export class FilterCountsService {
       if (['R', 'S', 'T'].includes(letter)) return 'De (R-T)';
       if (['U', 'V', 'W'].includes(letter)) return 'De (U-W)';
       if (['X', 'Y', 'Z'].includes(letter)) return 'De (X-Z)';
-      
+
       return 'De (X-Z)';
     };
 
@@ -191,15 +187,16 @@ export class FilterCountsService {
     const fixers = await PerformanceCount.measure(
       'Range Counts Aggregation',
       queryWithoutFixerFilter,
-      () => Offer.aggregate<FixerResult>([
-        { $match: queryWithoutFixerFilter },
-        {
-          $group: {
-            _id: '$fixerName',
-            count: { $sum: 1 },
+      () =>
+        Offer.aggregate<FixerResult>([
+          { $match: queryWithoutFixerFilter },
+          {
+            $group: {
+              _id: '$fixerName',
+              count: { $sum: 1 },
+            },
           },
-        },
-      ]).exec()
+        ]).exec(),
     );
 
     fixers.forEach((fixer) => {
@@ -207,13 +204,13 @@ export class FilterCountsService {
         console.warn('⚠️ Skipping fixer with invalid _id:', fixer);
         return;
       }
-      
+
       const trimmedId = fixer._id.trim();
       if (!trimmedId) {
         console.warn('⚠️ Skipping fixer with empty name');
         return;
       }
-      
+
       const firstLetter = trimmedId.charAt(0);
       if (firstLetter) {
         const rangeKey = getRangeKey(firstLetter);
@@ -233,17 +230,15 @@ export class FilterCountsService {
       const cleaned = raw.replace(/[^\p{L}\p{N}]+/gu, ' ');
       const escapeForRegex = (s: string) => s.replace(/[-\\/\\^$*+?.()|[\]{}]/g, '\\$&');
       const parts = cleaned.split(/\s+/).filter(Boolean).map(escapeForRegex);
-      
+
       // ✅ Aplicar el patrón sin acentos a cada parte
-      const accentInsensitiveParts = parts.map(part => 
-        this.createAccentInsensitivePattern(part)
-      );
-      
+      const accentInsensitiveParts = parts.map((part) => this.createAccentInsensitivePattern(part));
+
       const pattern = accentInsensitiveParts.join('\\s*');
       const searchRegex = new RegExp(pattern, 'i');
-      
+
       console.log('🔍 Search pattern (accent-insensitive):', pattern);
-      
+
       query.$or = [
         { title: searchRegex },
         { description: searchRegex },
@@ -255,19 +250,17 @@ export class FilterCountsService {
     }
 
     if (options.ranges && options.ranges.length > 0) {
-      const regexes = options.ranges
-        .map((r) => getRangeRegex(r))
-        .filter(Boolean) as RegExp[];
-      
+      const regexes = options.ranges.map((r) => getRangeRegex(r)).filter(Boolean) as RegExp[];
+
       if (regexes.length > 0) {
         if (regexes.length === 1) {
           query.fixerName = regexes[0];
         } else {
           const allLetters = new Set<string>();
-          regexes.forEach(regex => {
+          regexes.forEach((regex) => {
             const match = regex.source.match(/\[([^\]]+)\]/);
             if (match) {
-              match[1].split('').forEach(letter => allLetters.add(letter));
+              match[1].split('').forEach((letter) => allLetters.add(letter));
             }
           });
           const combinedPattern = `^[${Array.from(allLetters).join('')}]`;
@@ -277,17 +270,17 @@ export class FilterCountsService {
     }
 
     if (options.city) {
-      const cities = options.city.split(',').map(c => c.trim()).filter(Boolean);
+      const cities = options.city
+        .split(',')
+        .map((c) => c.trim())
+        .filter(Boolean);
       if (cities.length === 1) {
         query.city = validateAndNormalizeCity(cities[0]);
       } else if (cities.length > 1) {
-        const normalizedCities = cities
-          .map(c => validateAndNormalizeCity(c))
-          .filter(Boolean);
+        const normalizedCities = cities.map((c) => validateAndNormalizeCity(c)).filter(Boolean);
         if (normalizedCities.length > 0) {
-          query.city = normalizedCities.length === 1 
-            ? normalizedCities[0] 
-            : { $in: normalizedCities };
+          query.city =
+            normalizedCities.length === 1 ? normalizedCities[0] : { $in: normalizedCities };
         }
       }
     }
@@ -297,9 +290,10 @@ export class FilterCountsService {
         .map((c) => validateAndNormalizeCategory(c))
         .filter(Boolean) as string[];
       if (normalizedCategories.length > 0) {
-        query.category = normalizedCategories.length === 1
-          ? normalizedCategories[0]
-          : { $in: normalizedCategories };
+        query.category =
+          normalizedCategories.length === 1
+            ? normalizedCategories[0]
+            : { $in: normalizedCategories };
       }
     }
 
@@ -319,7 +313,7 @@ export class FilterCountsService {
 
   private static async getCityCounts(
     baseQuery: MongoQuery,
-    options: FilterCountsOptions
+    options: FilterCountsOptions,
   ): Promise<Record<string, number>> {
     const queryWithoutCityFilter = { ...baseQuery };
     delete queryWithoutCityFilter.city;
@@ -349,7 +343,7 @@ export class FilterCountsService {
         ]);
 
         const hasComplexQuery = queryWithoutCityFilter.$or || queryWithoutCityFilter.fixerName;
-        
+
         if (!hasComplexQuery) {
           if (queryWithoutCityFilter.category) {
             aggregation.hint('city_1_category_1');
@@ -359,20 +353,23 @@ export class FilterCountsService {
         }
 
         return aggregation.exec();
-      }
+      },
     );
 
     console.log('🏙️ City counts from DB:', counts);
 
-    return counts.reduce((acc, item) => {
-      acc[item._id] = item.count;
-      return acc;
-    }, {} as Record<string, number>);
+    return counts.reduce(
+      (acc, item) => {
+        acc[item._id] = item.count;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
   }
 
   private static async getCategoryCounts(
     baseQuery: MongoQuery,
-    options: FilterCountsOptions
+    options: FilterCountsOptions,
   ): Promise<Record<string, number>> {
     const queryWithoutCategoryFilter = { ...baseQuery };
     delete queryWithoutCategoryFilter.category;
@@ -401,8 +398,9 @@ export class FilterCountsService {
           { $sort: { count: -1, _id: 1 } },
         ]);
 
-        const hasComplexQuery = queryWithoutCategoryFilter.$or || queryWithoutCategoryFilter.fixerName;
-        
+        const hasComplexQuery =
+          queryWithoutCategoryFilter.$or || queryWithoutCategoryFilter.fixerName;
+
         if (!hasComplexQuery) {
           if (queryWithoutCategoryFilter.city) {
             aggregation.hint('city_1_category_1');
@@ -412,20 +410,23 @@ export class FilterCountsService {
         }
 
         return aggregation.exec();
-      }
+      },
     );
 
     console.log('📊 Category counts from DB:', counts);
 
-    return counts.reduce((acc, item) => {
-      acc[item._id] = item.count;
-      return acc;
-    }, {} as Record<string, number>);
+    return counts.reduce(
+      (acc, item) => {
+        acc[item._id] = item.count;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
   }
 
   private static async getRatingCounts(
     baseQuery: MongoQuery,
-    options: FilterCountsOptions
+    options: FilterCountsOptions,
   ): Promise<Record<string, number>> {
     const queryWithoutRatingFilter = { ...baseQuery };
     delete queryWithoutRatingFilter.rating;
@@ -442,19 +443,20 @@ export class FilterCountsService {
     const counts = await PerformanceCount.measure(
       'Rating Counts Aggregation',
       queryWithoutRatingFilter,
-      () => Offer.aggregate<BucketResult>([
-        { $match: queryWithoutRatingFilter },
-        {
-          $bucket: {
-            groupBy: '$rating',
-            boundaries: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
-            default: 'other',
-            output: {
-              count: { $sum: 1 },
+      () =>
+        Offer.aggregate<BucketResult>([
+          { $match: queryWithoutRatingFilter },
+          {
+            $bucket: {
+              groupBy: '$rating',
+              boundaries: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+              default: 'other',
+              output: {
+                count: { $sum: 1 },
+              },
             },
           },
-        },
-      ]).exec()
+        ]).exec(),
     );
 
     const ratingRanges: Record<string, number> = {};

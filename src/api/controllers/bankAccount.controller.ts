@@ -13,14 +13,7 @@ import User from '../../models/userPayment.model'; // Mantenemos TU ruta local
  */
 export const createBankAccount = async (req: Request, res: Response) => {
   try {
-    const {
-      fixerId,
-      nameFixer,
-      identification,
-      accountType,
-      accountNumber,
-      bankName,
-    } = req.body;
+    const { fixerId, nameFixer, identification, accountType, accountNumber, bankName } = req.body;
 
     // Validación básica
     if (!fixerId || !accountNumber || !bankName) {
@@ -52,17 +45,13 @@ export const createBankAccount = async (req: Request, res: Response) => {
     await newBankAccount.save();
 
     // Actualizar estado del usuario
-    await User.findOneAndUpdate(
-      { _id: fixerId },
-      { bank_status: 'CCB' }
-    );
+    await User.findOneAndUpdate({ _id: fixerId }, { bank_status: 'CCB' });
 
     // Respuesta exitosa
     res.status(201).json({
       message: 'Cuenta bancaria registrada exitosamente y estado de usuario actualizado a CCB.',
       data: newBankAccount.toJSON(),
     });
-
   } catch (error: unknown) {
     // MEJORA DEL GENERAL: Tipado estricto de errores
     if (error instanceof MongoServerError && error.code === 11000) {
@@ -104,16 +93,12 @@ export const deleteBankAccount = async (req: Request, res: Response) => {
     }
 
     // Actualizar el estado del usuario/fixer a SCB
-    await User.findOneAndUpdate(
-      { _id: fixerId },
-      { bank_status: 'SCB' }
-    );
+    await User.findOneAndUpdate({ _id: fixerId }, { bank_status: 'SCB' });
 
     res.status(200).json({
       message: 'Cuenta bancaria eliminada exitosamente y estado de usuario actualizado a SCB.',
       deletedId: deletedAccount._id,
     });
-
   } catch (error: unknown) {
     console.error('Error al eliminar cuenta bancaria:', error);
     res.status(500).json({

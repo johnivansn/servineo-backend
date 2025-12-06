@@ -1,6 +1,6 @@
-import { OAuth2Client } from "google-auth-library";
-import { User } from "../../models/user.model";
-import { IUser } from "../../models/user.model";
+import { OAuth2Client } from 'google-auth-library';
+import { User } from '../../models/user.model';
+import { IUser } from '../../models/user.model';
 
 interface GoogleUser {
   email: string;
@@ -21,15 +21,15 @@ export async function verifyGoogleToken(token: string) {
 
   return {
     email: payload.email,
-    name: payload.name || "Sin Nombre",
-    picture: payload.picture || "",
+    name: payload.name || 'Sin Nombre',
+    picture: payload.picture || '',
   };
 }
 
 export async function findUserByEmail(email: string): Promise<IUser | null> {
   return await User.findOne({
-    "authProviders.provider": "google",
-    "authProviders.providerId": email,
+    'authProviders.provider': 'google',
+    'authProviders.providerId': email,
   });
 }
 
@@ -41,33 +41,33 @@ export async function createUser(googleUser: GoogleUser) {
   const newUser = await User.create({
     name: googleUser.name,
     email: googleUser.email,
-    url_photo: googleUser.picture || "",
-    role: "requester",
+    url_photo: googleUser.picture || '',
+    role: 'requester',
 
     authProviders: [
       {
-        provider: "google",
+        provider: 'google',
         providerId: googleUser.email,
-        password: "",
+        password: '',
       },
     ],
 
-    telefono: "",
+    telefono: '',
 
     ubicacion: {
       lat: null,
       lng: null,
-      direccion: "",
-      departamento: "",
-      pais: "",
+      direccion: '',
+      departamento: '',
+      pais: '',
     },
 
-    ci: "",
+    ci: '',
     servicios: [],
 
     vehiculo: {
       hasVehiculo: false,
-      tipoVehiculo: "",
+      tipoVehiculo: '',
     },
 
     acceptTerms: false,
@@ -79,20 +79,19 @@ export async function createUser(googleUser: GoogleUser) {
     },
 
     experience: {
-      descripcion: "",
+      descripcion: '',
     },
 
     workLocation: {
       lat: null,
       lng: null,
-      direccion: "",
-      departamento: "",
-      pais: "",
+      direccion: '',
+      departamento: '',
+      pais: '',
     },
 
-    fixerProfile: "",
+    fixerProfile: '',
   });
 
   return newUser;
 }
-

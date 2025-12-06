@@ -4,13 +4,13 @@ import {
   getJobsByFixer,
   createJob,
   updateJob,
-  deleteJob
+  deleteJob,
 } from '../controllers/job.controller';
 
 const router = Router();
 
 router.get('/', getAllJobs);
-router.get('/fixer/:fixerId', getJobsByFixer); 
+router.get('/fixer/:fixerId', getJobsByFixer);
 router.post('/', createJob);
 router.patch('/:jobId', updateJob);
 router.delete('/:jobId', deleteJob);

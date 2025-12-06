@@ -37,7 +37,7 @@ const JobOfferSchema = new Schema<IJobOffer>(
       address: { type: String },
     },
   },
-  { collection: 'offers' }
+  { collection: 'offers' },
 );
 
 export const JobOfferModel = mongoose.model<IJobOffer>('JobOffer', JobOfferSchema);

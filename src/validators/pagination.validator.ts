@@ -14,8 +14,7 @@ export function validatePageRange(
   currentPage: number,
   totalItems: number,
   itemsPerPage: number,
-): PaginationValidationResult
- {
+): PaginationValidationResult {
   const totalPages = totalItems > 0 ? Math.ceil(totalItems / itemsPerPage) : 0;
 
   // Si no hay items, cualquier página es válida (retornará array vacío)
@@ -32,7 +31,7 @@ export function validatePageRange(
     return {
       isValid: true,
       currentPage: totalPages,
-      totalPages, 
+      totalPages,
     };
   }
 

@@ -41,13 +41,13 @@ export interface IUserProfile extends Document {
       }>;
     }>;
     vehicle: {
-        type: {
-            hasVehicle: { type: boolean },
-            type?: string,
-            details?: string,
-        },
-  required: false, 
-},
+      type: {
+        hasVehicle: { type: boolean };
+        type?: string;
+        details?: string;
+      };
+      required: false;
+    };
     terms: {
       accepted: boolean;
       acceptedAt?: Date;
@@ -77,7 +77,7 @@ const UserProfileSchema = new Schema<IUserProfile>({
     id: { type: String, required: true },
     name: { type: String, required: true },
     email: { type: String, required: true },
-    phone: { type: String,  },
+    phone: { type: String },
     role: { type: String, enum: ['fixer', 'requester'], required: true },
     urlPhoto: String,
   },
@@ -143,7 +143,7 @@ const UserProfileSchema = new Schema<IUserProfile>({
       },
       hourlyRate: Number,
     },
-    status: { type: String, enum: ['pending', 'approved', 'rejected'], },
+    status: { type: String, enum: ['pending', 'approved', 'rejected'] },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
   },

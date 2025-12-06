@@ -121,7 +121,7 @@ app.use('/auth', githubAuthRouter);
 app.use('/auth', discordRoutes);
 app.use('/api/controlC/cliente', clienteRouter);
 app.use('/api/admin', adminRouter);
-app.use("/api/admin/chart", chartRoutes);
+app.use('/api/admin/chart', chartRoutes);
 app.use('/api/user', routerUser);
 //ruta oficial para ofertas de trabajo no borrar
 app.use('/api/job-offers', jobOfficial);

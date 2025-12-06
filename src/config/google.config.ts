@@ -12,14 +12,16 @@ const GOOGLE_REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN;
 // Verificación básica para evitar errores locos si falta algo
 if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !GOOGLE_REFRESH_TOKEN) {
   console.error('ERROR: Faltan variables de entorno de Google Calendar.');
-  console.error('Asegúrate de tener GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET y GOOGLE_REFRESH_TOKEN en tu .env');
+  console.error(
+    'Asegúrate de tener GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET y GOOGLE_REFRESH_TOKEN en tu .env',
+  );
 }
 
 // 2. Configuramos el cliente OAuth2
 const oauth2Client = new google.auth.OAuth2(
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
-  "https://developers.google.com/oauthplayground"
+  'https://developers.google.com/oauthplayground',
 );
 
 // 3. ¡La magia! Seteamos el refresh token.
@@ -29,9 +31,9 @@ oauth2Client.setCredentials({
 });
 
 // 4. Creamos la instancia del calendario
-const calendar = google.calendar({ 
-  version: 'v3', 
-  auth: oauth2Client 
+const calendar = google.calendar({
+  version: 'v3',
+  auth: oauth2Client,
 });
 
 // Exportamos la instancia lista para usar y el ID del calendario

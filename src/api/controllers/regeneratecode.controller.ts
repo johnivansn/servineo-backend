@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
-import mongoose from "mongoose";
-import { Payment } from "../../models/payment.model";
-import crypto from "crypto";
+import { Request, Response } from 'express';
+import mongoose from 'mongoose';
+import { Payment } from '../../models/payment.model';
+import crypto from 'crypto';
 
 const CODE_EXPIRATION_MS = 24 * 60 * 60 * 1000; // 48 horas
 
@@ -24,14 +24,14 @@ function generateSecureCode(length: number = 6): string {
 // ============================================
 export const regeneratePaymentCodeByJob = async (req: Request, res: Response) => {
   const session = await mongoose.startSession();
-  
+
   try {
     const { jobId } = req.params as { jobId: string };
 
     // Validar jobId
     if (!jobId || !mongoose.isValidObjectId(jobId)) {
-      return res.status(400).json({ 
-        error: "jobId inválido" 
+      return res.status(400).json({
+        error: 'jobId inválido',
       });
     }
 
@@ -39,26 +39,26 @@ export const regeneratePaymentCodeByJob = async (req: Request, res: Response) =>
 
     // Buscar el pago que coincida con el jobId (independiente del status)
     const payment = await Payment.findOne({
-      jobId: new mongoose.Types.ObjectId(jobId)
+      jobId: new mongoose.Types.ObjectId(jobId),
     })
-    .sort({ createdAt: -1 }) // Obtener el más reciente si hay varios
-    .session(session);
+      .sort({ createdAt: -1 }) // Obtener el más reciente si hay varios
+      .session(session);
 
     if (!payment) {
       await session.abortTransaction();
-      return res.status(404).json({ 
-        error: "No se encontró un pago asociado a este jobId" 
+      return res.status(404).json({
+        error: 'No se encontró un pago asociado a este jobId',
       });
     }
 
     // Verificar que el pago esté pendiente
     const status = String(payment.status).toLowerCase();
-    if (status !== "pending") {
+    if (status !== 'pending') {
       await session.abortTransaction();
-      return res.status(400).json({ 
-        error: "Solo se puede regenerar el código para pagos pendientes",
+      return res.status(400).json({
+        error: 'Solo se puede regenerar el código para pagos pendientes',
         currentStatus: payment.status,
-        jobId: String(payment.jobId)
+        jobId: String(payment.jobId),
       });
     }
 
@@ -69,18 +69,18 @@ export const regeneratePaymentCodeByJob = async (req: Request, res: Response) =>
 
     while (attempts < maxAttempts) {
       const candidate = generateSecureCode(6).toUpperCase();
-      
+
       // Verificar que el código no exista
-      const exists = await Payment.findOne({ 
+      const exists = await Payment.findOne({
         code: candidate,
-        _id: { $ne: payment._id } // Excluir el pago actual
+        _id: { $ne: payment._id }, // Excluir el pago actual
       }).session(session);
 
       if (!exists) {
         newCode = candidate;
         break;
       }
-      
+
       attempts++;
     }
 
@@ -103,7 +103,7 @@ export const regeneratePaymentCodeByJob = async (req: Request, res: Response) =>
     console.log(`✅ Código regenerado para job ${jobId}, payment ${payment._id}: ${newCode}`);
 
     return res.status(200).json({
-      message: "Código regenerado exitosamente",
+      message: 'Código regenerado exitosamente',
       data: {
         paymentId: String(payment._id),
         jobId: String(payment.jobId),
@@ -112,46 +112,44 @@ export const regeneratePaymentCodeByJob = async (req: Request, res: Response) =>
         status: payment.status,
         timeRemaining: {
           hours: 48,
-          milliseconds: CODE_EXPIRATION_MS
-        }
-      }
+          milliseconds: CODE_EXPIRATION_MS,
+        },
+      },
     });
-
   } catch (e: any) {
     await session.abortTransaction();
-    
-    console.error("❌ Error regenerando código por jobId:", {
+
+    console.error('❌ Error regenerando código por jobId:', {
       error: e.message,
       stack: e.stack,
-      jobId: req.params.jobId
+      jobId: req.params.jobId,
     });
 
     // Manejo de errores específicos
-    if (e.name === "ValidationError") {
-      return res.status(400).json({ 
-        error: "Error de validación",
-        details: process.env.NODE_ENV === 'development' ? e.message : undefined
+    if (e.name === 'ValidationError') {
+      return res.status(400).json({
+        error: 'Error de validación',
+        details: process.env.NODE_ENV === 'development' ? e.message : undefined,
       });
     }
 
     if (e.code === 11000) {
       // Colisión de código único (muy raro)
-      return res.status(409).json({ 
-        error: "Conflicto al generar código único, intenta nuevamente"
+      return res.status(409).json({
+        error: 'Conflicto al generar código único, intenta nuevamente',
       });
     }
 
-    if (e.name === "CastError") {
-      return res.status(400).json({ 
-        error: "Formato de jobId inválido" 
+    if (e.name === 'CastError') {
+      return res.status(400).json({
+        error: 'Formato de jobId inválido',
       });
     }
 
-    return res.status(500).json({ 
-      error: "Error del servidor al regenerar código",
-      ...(process.env.NODE_ENV === 'development' && { details: e.message })
+    return res.status(500).json({
+      error: 'Error del servidor al regenerar código',
+      ...(process.env.NODE_ENV === 'development' && { details: e.message }),
     });
-    
   } finally {
     session.endSession();
   }
@@ -166,14 +164,14 @@ export const checkCodeStatusByJob = async (req: Request, res: Response) => {
     const { jobId } = req.params as { jobId: string };
 
     if (!jobId || !mongoose.isValidObjectId(jobId)) {
-      return res.status(400).json({ 
-        error: "jobId inválido" 
+      return res.status(400).json({
+        error: 'jobId inválido',
       });
     }
 
     const payment = await Payment.findOne({
       jobId: new mongoose.Types.ObjectId(jobId),
-      status: "pending"
+      status: 'pending',
     })
       .select('code codeExpiresAt status failedAttempts lockUntil jobId')
       .lean<{
@@ -187,21 +185,19 @@ export const checkCodeStatusByJob = async (req: Request, res: Response) => {
       }>();
 
     if (!payment) {
-      return res.status(404).json({ 
-        error: "No se encontró un pago pendiente para este trabajo" 
+      return res.status(404).json({
+        error: 'No se encontró un pago pendiente para este trabajo',
       });
     }
 
     const now = new Date();
-    const isExpired = payment.codeExpiresAt 
-      ? payment.codeExpiresAt.getTime() < now.getTime() 
-      : false;
-    
-    const isLocked = payment.lockUntil 
-      ? payment.lockUntil.getTime() > now.getTime() 
+    const isExpired = payment.codeExpiresAt
+      ? payment.codeExpiresAt.getTime() < now.getTime()
       : false;
 
-    const msUntilExpiration = payment.codeExpiresAt 
+    const isLocked = payment.lockUntil ? payment.lockUntil.getTime() > now.getTime() : false;
+
+    const msUntilExpiration = payment.codeExpiresAt
       ? Math.max(0, payment.codeExpiresAt.getTime() - now.getTime())
       : 0;
 
@@ -221,21 +217,20 @@ export const checkCodeStatusByJob = async (req: Request, res: Response) => {
         timeRemaining: {
           hours: hoursUntilExpiration,
           minutes: minutesUntilExpiration,
-          milliseconds: msUntilExpiration
+          milliseconds: msUntilExpiration,
         },
         ...(isLocked && {
           unlocksAt: payment.lockUntil,
-          lockedMinutes: Math.ceil((payment.lockUntil!.getTime() - now.getTime()) / 60000)
-        })
-      }
+          lockedMinutes: Math.ceil((payment.lockUntil!.getTime() - now.getTime()) / 60000),
+        }),
+      },
     });
-
   } catch (e: any) {
-    console.error("❌ Error verificando estado del código por jobId:", e);
-    
-    return res.status(500).json({ 
-      error: "Error del servidor",
-      ...(process.env.NODE_ENV === 'development' && { details: e.message })
+    console.error('❌ Error verificando estado del código por jobId:', e);
+
+    return res.status(500).json({
+      error: 'Error del servidor',
+      ...(process.env.NODE_ENV === 'development' && { details: e.message }),
     });
   }
 };

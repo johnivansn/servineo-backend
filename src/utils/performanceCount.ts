@@ -11,13 +11,9 @@ export class PerformanceCount {
   private static logs: QueryPerformance[] = [];
   private static warningThreshold = 100; // ms
 
-  static async measure<T>(
-    operation: string,
-    query: unknown,
-    fn: () => Promise<T>
-  ): Promise<T> {
+  static async measure<T>(operation: string, query: unknown, fn: () => Promise<T>): Promise<T> {
     const start = Date.now();
-    
+
     try {
       const result = await fn();
       const duration = Date.now() - start;
@@ -34,7 +30,7 @@ export class PerformanceCount {
       if (duration > this.warningThreshold) {
         console.warn(
           `⚠️  SLOW QUERY [${duration}ms]: ${operation}`,
-          JSON.stringify(query, null, 2)
+          JSON.stringify(query, null, 2),
         );
       } else {
         console.log(`✅ [${duration}ms]: ${operation}`);
@@ -59,8 +55,8 @@ export class PerformanceCount {
       };
     }
 
-    const durations = this.logs.map(log => log.duration);
-    const slowQueries = this.logs.filter(log => log.duration > this.warningThreshold);
+    const durations = this.logs.map((log) => log.duration);
+    const slowQueries = this.logs.filter((log) => log.duration > this.warningThreshold);
 
     return {
       count: this.logs.length,

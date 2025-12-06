@@ -56,12 +56,16 @@ export function makeWalletCollectionByUserIdAdapter(
       if (patch.lowBalanceThreshold !== undefined)
         $set.lowBalanceThreshold = patch.lowBalanceThreshold;
       if (patch.flags !== undefined) $set.flags = patch.flags;
-      if (patch.lastLowBalanceNotification !== undefined) $set.lastLowBalanceNotification = patch.lastLowBalanceNotification;
+      if (patch.lastLowBalanceNotification !== undefined)
+        $set.lastLowBalanceNotification = patch.lastLowBalanceNotification;
       const $setOnInsert: Record<string, unknown> = { createdAt: new Date() };
-      $setOnInsert[idField] = process.env.WALLET_USER_ID_IS_OBJECTID === 'true'
-        ? new mongoose.Types.ObjectId(String(fixerId))
-        : String(fixerId);
-      await db.collection(collectionName).updateOne(query, { $set, $setOnInsert }, { upsert: true });
+      $setOnInsert[idField] =
+        process.env.WALLET_USER_ID_IS_OBJECTID === 'true'
+          ? new mongoose.Types.ObjectId(String(fixerId))
+          : String(fixerId);
+      await db
+        .collection(collectionName)
+        .updateOne(query, { $set, $setOnInsert }, { upsert: true });
     },
   };
 }

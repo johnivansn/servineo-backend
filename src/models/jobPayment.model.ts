@@ -7,7 +7,14 @@ import mongoose, { Schema, Document, model, models } from 'mongoose';
 export interface IJob extends Document {
   title: string;
   description: string;
-  status: 'Pendiente' | 'Aceptado' | 'EnProgreso' | 'Completado' | 'Pagado' | 'Cancelado' | 'Sin Pagar';
+  status:
+    | 'Pendiente'
+    | 'Aceptado'
+    | 'EnProgreso'
+    | 'Completado'
+    | 'Pagado'
+    | 'Cancelado'
+    | 'Sin Pagar';
   requesterId: mongoose.Schema.Types.ObjectId;
   fixerId: mongoose.Schema.Types.ObjectId;
   price: number;
@@ -23,22 +30,30 @@ export interface IJob extends Document {
 // Define la estructura de la colección en MongoDB.
 const jobSchema = new Schema<IJob>(
   {
-    title: { 
-      type: String, 
-      required: true, 
-      trim: true 
+    title: {
+      type: String,
+      required: true,
+      trim: true,
     },
-    description: { 
-      type: String, 
+    description: {
+      type: String,
       required: false, // Asumiendo que puede estar vacío
-      trim: true 
+      trim: true,
     },
     status: {
       type: String,
       required: true,
-      // Usar un 'enum' es una buena práctica para validar que 'status' 
+      // Usar un 'enum' es una buena práctica para validar que 'status'
       // solo puede ser uno de estos valores.
-      enum: ['Pendiente', 'Aceptado', 'EnProgreso', 'Completado', 'Pagado', 'Cancelado', 'Sin Pagar'],
+      enum: [
+        'Pendiente',
+        'Aceptado',
+        'EnProgreso',
+        'Completado',
+        'Pagado',
+        'Cancelado',
+        'Sin Pagar',
+      ],
       default: 'Pendiente',
     },
     requesterId: {
@@ -63,7 +78,7 @@ const jobSchema = new Schema<IJob>(
     comment: {
       type: String,
       required: false,
-      trim: true
+      trim: true,
     },
     type: {
       type: String,
@@ -74,11 +89,11 @@ const jobSchema = new Schema<IJob>(
     // 3. Opciones del Esquema
     // 'timestamps: true' añade automáticamente los campos 'createdAt' y 'updatedAt'
     timestamps: true,
-  }
+  },
 );
 
 // 4. Creación del Modelo
-// 'models.Job' previene que Mongoose compile el modelo múltiples veces 
+// 'models.Job' previene que Mongoose compile el modelo múltiples veces
 // (un problema común en Next.js con hot-reloading).
 const Job = models.Job || model<IJob>('Job', jobSchema);
 

@@ -17,12 +17,9 @@ export const createPortfolioItem = async (req: Request, res: Response) => {
     // 1) req.user (si en el futuro activas JWT)
     // 2) req.body.fixerId enviado desde el front
     // 3) "fixer1" como valor de prueba
-    const fixerId =
-      (req as any).user?._id ||
-      req.body.fixerId ||
-      "fixer1";
+    const fixerId = (req as any).user?._id || req.body.fixerId || 'fixer1';
 
-    let url = "";
+    let url = '';
 
     // 🔹 Si viene un archivo (imagen) lo subimos a Firebase
     if ((req as any).file) {
@@ -37,8 +34,8 @@ export const createPortfolioItem = async (req: Request, res: Response) => {
       });
 
       await new Promise<void>((resolve, reject) => {
-        blobStream.on("error", (error: any) => reject(error));
-        blobStream.on("finish", async () => {
+        blobStream.on('error', (error: any) => reject(error));
+        blobStream.on('finish', async () => {
           await fileUpload.makePublic();
           url = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
           resolve();
@@ -59,8 +56,8 @@ export const createPortfolioItem = async (req: Request, res: Response) => {
 
     res.status(201).json(portfolioItem);
   } catch (error) {
-    console.error("🔥 Error en createPortfolioItem:", error);
-    res.status(400).json({ message: "Error creating portfolio item", error });
+    console.error('🔥 Error en createPortfolioItem:', error);
+    res.status(400).json({ message: 'Error creating portfolio item', error });
   }
 };
 
@@ -73,8 +70,8 @@ export const getPortfolioByFixerId = async (req: Request, res: Response) => {
     const portfolioItems = await Portfolio.find({ fixerId });
     res.status(200).json(portfolioItems);
   } catch (error) {
-    console.error("🔥 Error en getPortfolioByFixerId:", error);
-    res.status(500).json({ message: "Error fetching portfolio items", error });
+    console.error('🔥 Error en getPortfolioByFixerId:', error);
+    res.status(500).json({ message: 'Error fetching portfolio items', error });
   }
 };
 
@@ -87,13 +84,13 @@ export const deletePortfolioItem = async (req: Request, res: Response) => {
     const portfolioItem = await Portfolio.findByIdAndDelete(id);
 
     if (!portfolioItem) {
-      return res.status(404).json({ message: "Portfolio item not found" });
+      return res.status(404).json({ message: 'Portfolio item not found' });
     }
 
-    res.status(200).json({ message: "Portfolio item deleted successfully" });
+    res.status(200).json({ message: 'Portfolio item deleted successfully' });
   } catch (error) {
-    console.error("🔥 Error en deletePortfolioItem:", error);
-    res.status(500).json({ message: "Error deleting portfolio item", error });
+    console.error('🔥 Error en deletePortfolioItem:', error);
+    res.status(500).json({ message: 'Error deleting portfolio item', error });
   }
 };
 
@@ -107,12 +104,12 @@ export const updatePortfolioItem = async (req: Request, res: Response) => {
     const portfolioItem = await Portfolio.findByIdAndUpdate(id, req.body, { new: true });
 
     if (!portfolioItem) {
-      return res.status(404).json({ message: "Portfolio item not found" });
+      return res.status(404).json({ message: 'Portfolio item not found' });
     }
 
     res.status(200).json(portfolioItem);
   } catch (error) {
-    console.error("🔥 Error en updatePortfolioItem:", error);
-    res.status(400).json({ message: "Error updating portfolio item", error });
+    console.error('🔥 Error en updatePortfolioItem:', error);
+    res.status(400).json({ message: 'Error updating portfolio item', error });
   }
 };

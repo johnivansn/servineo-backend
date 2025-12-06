@@ -5,7 +5,7 @@ export const createExperience = async (req: Request, res: Response) => {
   try {
     // Ahora el fixerId viene del body directamente
     const experienceData = req.body;
-    
+
     if (!experienceData.fixerId) {
       return res.status(400).json({ message: 'fixerId es requerido' });
     }
@@ -40,13 +40,13 @@ export const updateExperience = async (req: Request, res: Response) => {
     const experience = await Experience.findOneAndUpdate(
       { _id: id, fixerId }, // Verificar que la experiencia pertenece al fixer
       updateData,
-      { new: true }
+      { new: true },
     );
-    
+
     if (!experience) {
       return res.status(404).json({ message: 'Experience not found' });
     }
-    
+
     res.status(200).json(experience);
   } catch (error) {
     res.status(400).json({ message: 'Error updating experience', error });
@@ -63,11 +63,11 @@ export const deleteExperience = async (req: Request, res: Response) => {
     }
 
     const experience = await Experience.findOneAndDelete({ _id: id, fixerId });
-    
+
     if (!experience) {
       return res.status(404).json({ message: 'Experience not found' });
     }
-    
+
     res.status(200).json({ message: 'Experience deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting experience', error });

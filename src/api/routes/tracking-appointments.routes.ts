@@ -1,5 +1,9 @@
 import { Router } from 'express';
-import { getMapLocations, getTrackingMetrics, getFixerStats } from '../controllers/tracking-appointments.controller';
+import {
+  getMapLocations,
+  getTrackingMetrics,
+  getFixerStats,
+} from '../controllers/tracking-appointments.controller';
 
 const router = Router();
 router.get('/map-locations', getMapLocations);

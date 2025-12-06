@@ -37,11 +37,9 @@ export const createJob = async (req: Request, res: Response) => {
 export const updateJob = async (req: Request<{ jobId: string }, {}, any>, res: Response) => {
   try {
     const { jobId } = req.params;
-    const job = await Job.findOneAndUpdate(
-      { _id: jobId, fixerId: req.body.fixerId },
-      req.body,
-      { new: true }
-    );
+    const job = await Job.findOneAndUpdate({ _id: jobId, fixerId: req.body.fixerId }, req.body, {
+      new: true,
+    });
     if (!job) return res.status(404).json({ error: 'Job not found or not authorized' });
     res.json(job);
   } catch (error: any) {

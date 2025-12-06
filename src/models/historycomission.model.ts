@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, model, models } from "mongoose";
+import mongoose, { Schema, Document, model, models } from 'mongoose';
 
 export interface IComision extends Document {
   wallets_id: mongoose.Types.ObjectId;
@@ -7,7 +7,7 @@ export interface IComision extends Document {
   comision: number;
   monto_servicio: number;
   tipo_servicio: string;
-  estado: "completada" | "fallida"; // Solo 2 estados simples
+  estado: 'completada' | 'fallida'; // Solo 2 estados simples
   motivo_fallo?: string; // Solo si falla
   fecha_completada?: Date; // Solo si se completa
   createdAt: Date;
@@ -17,17 +17,17 @@ const comisionSchema = new Schema<IComision>(
   {
     wallets_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Wallet",
+      ref: 'Wallet',
       required: [true, 'El ID de la wallet es obligatorio'],
     },
     payments_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "payments",
+      ref: 'payments',
       required: [true, 'El ID del payments es obligatorio'],
     },
     fixer_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: [true, 'El ID del fixer es obligatorio'],
     },
     comision: {
@@ -46,7 +46,7 @@ const comisionSchema = new Schema<IComision>(
     },
     estado: {
       type: String,
-      enum: ["completada", "fallida"], // Solo 2 opciones
+      enum: ['completada', 'fallida'], // Solo 2 opciones
       required: true,
     },
     motivo_fallo: {
@@ -59,10 +59,10 @@ const comisionSchema = new Schema<IComision>(
       required: false,
     },
   },
-  { 
+  {
     timestamps: { createdAt: true, updatedAt: false },
-    versionKey: false 
-  }
+    versionKey: false,
+  },
 );
 
-export const Comision = models.Comision || model<IComision>("Comision", comisionSchema);
+export const Comision = models.Comision || model<IComision>('Comision', comisionSchema);

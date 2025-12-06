@@ -12,7 +12,7 @@ export function normalizeSearchText(text: string): string {
   normalizedText = normalizedText.replace(/[ÍíÌìÎîÏïĨĩĪīĬĭǏǐ]/g, 'i');
   normalizedText = normalizedText.replace(/[ÓóÒòÔôÖöÕõŌōŎŏǑǒȮȯ]/g, 'o');
   normalizedText = normalizedText.replace(/[ÚúÙùÛûÜüŨũŮůŪūŬŭǓǔ]/g, 'u');
-  
+
   normalizedText = normalizedText.replace(/a/g, '[aáäà]');
   normalizedText = normalizedText.replace(/e/g, '[eéëè]');
   normalizedText = normalizedText.replace(/i/g, '[iíïì]');
@@ -54,12 +54,9 @@ export function generatePluralVariations(text: string): string[] {
     if (!variations.includes(normalized.slice(0, -1))) {
       variations.push(normalized.slice(0, -1));
     }
-  }
-   else if (normalized.endsWith('s') && normalized.length > 2) {
+  } else if (normalized.endsWith('s') && normalized.length > 2) {
     variations.push(normalized.slice(0, -1));
-  }
-  
-  else {
+  } else {
     variations.push(normalized + 's');
 
     const lastChar = normalized.charAt(normalized.length - 1);

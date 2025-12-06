@@ -1,5 +1,5 @@
-import { User } from "../../models/user.model";
-import { EnableFixerInput } from "../../types/EnableFixerInput";
+import { User } from '../../models/user.model';
+import { EnableFixerInput } from '../../types/EnableFixerInput';
 
 export class FixerService {
   async enableFixer(data: EnableFixerInput) {
@@ -12,7 +12,7 @@ export class FixerService {
 
     const updateData: any = {
       role: 'fixer',
-      'fixerProfile': {
+      fixerProfile: {
         ...fixerData,
         experiences: experiencesWithId,
       },
@@ -23,11 +23,10 @@ export class FixerService {
       updateData.phone = phone;
     }
 
-    const result = await User.findByIdAndUpdate(
-      userId,
-      updateData,
-      { new: true, runValidators: true }
-    );
+    const result = await User.findByIdAndUpdate(userId, updateData, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!result) throw new Error('Usuario no encontrado');
 

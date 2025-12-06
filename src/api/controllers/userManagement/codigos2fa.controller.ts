@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import { verifyRecoveryCodeForEmail } from "../../../services/userManagement/codigos2fa.service";
+import { Request, Response } from 'express';
+import { verifyRecoveryCodeForEmail } from '../../../services/userManagement/codigos2fa.service';
 
 export async function verifyRecoveryCode(req: Request, res: Response) {
   try {
@@ -8,20 +8,19 @@ export async function verifyRecoveryCode(req: Request, res: Response) {
     if (!result.success) {
       return res.status(400).json({
         success: false,
-        error: result.message
+        error: result.message,
       });
     }
 
     return res.json({
       success: true,
-      data: result.data,  // token + user
-      message: result.message
+      data: result.data, // token + user
+      message: result.message,
     });
-
   } catch (err) {
     return res.status(500).json({
       success: false,
-      error: "Error interno del servidor"
+      error: 'Error interno del servidor',
     });
   }
 }

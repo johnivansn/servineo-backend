@@ -4,14 +4,10 @@ const COLLECTION = 'ofertadetrabajo';
 
 export const addJobOfferPhoto = async (
   userId: string,
-  file: any // ahora sí lo reconoce
+  file: any, // ahora sí lo reconoce
 ): Promise<string> => {
   // Contar fotos existentes
-  const snapshot = await db
-    .collection(COLLECTION)
-    .doc(userId)
-    .collection('photos')
-    .get();
+  const snapshot = await db.collection(COLLECTION).doc(userId).collection('photos').get();
 
   if (snapshot.size >= 5) {
     throw new Error('Máximo 5 fotos permitidas por usuario');
@@ -29,16 +25,12 @@ export const addJobOfferPhoto = async (
   const publicUrl = `https://storage.googleapis.com/${bucket.name}/job-offers/${fileName}`;
 
   // Guardar referencia
-  await db
-    .collection(COLLECTION)
-    .doc(userId)
-    .collection('photos')
-    .add({
-      url: publicUrl,
-      fileName,
-      originalName: file.originalname,
-      uploadedAt: new Date(),
-    });
+  await db.collection(COLLECTION).doc(userId).collection('photos').add({
+    url: publicUrl,
+    fileName,
+    originalName: file.originalname,
+    uploadedAt: new Date(),
+  });
 
   return publicUrl;
 };
@@ -58,6 +50,9 @@ export const getJobOfferPhotos = async (userId: string) => {
 };
 
 export const deleteJobOfferPhoto = async (userId: string, photoId: string, fileName: string) => {
-  await bucket.file(`job-offers/${fileName}`).delete().catch(() => {});
+  await bucket
+    .file(`job-offers/${fileName}`)
+    .delete()
+    .catch(() => {});
   await db.collection(COLLECTION).doc(userId).collection('photos').doc(photoId).delete();
 };

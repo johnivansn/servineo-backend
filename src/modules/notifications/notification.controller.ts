@@ -86,7 +86,8 @@ const normalizeIdentifier = (value?: unknown): string | null => {
   return asString;
 };
 
-const normalizeTipo = (tipo?: string | null): string => (typeof tipo === 'string' ? tipo.trim().toLowerCase() : '');
+const normalizeTipo = (tipo?: string | null): string =>
+  typeof tipo === 'string' ? tipo.trim().toLowerCase() : '';
 
 const getUserRole = async (userId?: string | null): Promise<string | null> => {
   if (!userId) {
@@ -105,7 +106,7 @@ const getUserRole = async (userId?: string | null): Promise<string | null> => {
 
 const resolveNotificationUserId = (
   notification: NotificationRecord,
-  fallbackUserId?: string | null
+  fallbackUserId?: string | null,
 ): string | null => {
   const source = notification as Record<string, unknown>;
 
@@ -169,7 +170,10 @@ const buildRecordKey = (notification: NotificationRecord, ownerId: string): stri
   return `id:${notification._id.toString()}`;
 };
 
-const applyDeliveryRules = (notifications: NotificationRecord[], normalizedUserId: string): NotificationRecord[] => {
+const applyDeliveryRules = (
+  notifications: NotificationRecord[],
+  normalizedUserId: string,
+): NotificationRecord[] => {
   const seenKeys = new Set<string>();
   const sanitized: NotificationRecord[] = [];
 
@@ -207,13 +211,15 @@ const applyDeliveryRules = (notifications: NotificationRecord[], normalizedUserI
 
 const filterNotificationsByRole = (
   notifications: NotificationRecord[],
-  userRole?: string | null
+  userRole?: string | null,
 ): NotificationRecord[] => {
   if (!userRole || userRole !== FIXER_ROLE) {
     return notifications;
   }
 
-  return notifications.filter((notification) => normalizeTipo(notification.tipo) !== DISCONNECTION_TYPE);
+  return notifications.filter(
+    (notification) => normalizeTipo(notification.tipo) !== DISCONNECTION_TYPE,
+  );
 };
 
 const OWNER_FIELD_PROJECTION = [
@@ -232,21 +238,23 @@ const OWNER_FIELD_PROJECTION = [
 ];
 
 const buildOwnerSnapshotMap = async (
-  notifications: NotificationRecord[]
+  notifications: NotificationRecord[],
 ): Promise<Map<string, Record<string, unknown>>> => {
   const ownerIds = Array.from(
     new Set(
       notifications
         .map((notification) => resolveNotificationUserId(notification, null))
-        .filter((value): value is string => Boolean(value))
-    )
+        .filter((value): value is string => Boolean(value)),
+    ),
   );
 
   if (!ownerIds.length) {
     return new Map();
   }
 
-  const searchableIds = ownerIds.filter((id) => Types.ObjectId.isValid(id)).map((id) => new Types.ObjectId(id));
+  const searchableIds = ownerIds
+    .filter((id) => Types.ObjectId.isValid(id))
+    .map((id) => new Types.ObjectId(id));
 
   if (!searchableIds.length) {
     return new Map();
@@ -277,7 +285,7 @@ const buildOwnerSnapshotMap = async (
 };
 
 const enrichNotificationsWithOwner = async (
-  notifications: NotificationRecord[]
+  notifications: NotificationRecord[],
 ): Promise<NotificationRecord[]> => {
   if (!notifications.length) {
     return notifications;
@@ -290,7 +298,7 @@ const enrichNotificationsWithOwner = async (
     return {
       ...notification,
       ownerId,
-      owner: ownerId ? ownerMap.get(ownerId) ?? null : null,
+      owner: ownerId ? (ownerMap.get(ownerId) ?? null) : null,
     };
   });
 };
@@ -353,7 +361,7 @@ const buildAppointmentFilter = (appointmentId?: string | null) => {
  */
 export async function getAllNotificationsController(
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ): Promise<Response> {
   try {
     const normalizedUserId = normalizeIdentifier(req.userId);
@@ -402,7 +410,7 @@ export async function getAllNotificationsController(
  */
 export async function getNotificationsByTypeController(
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ): Promise<Response> {
   try {
     const { notification_type } = req.params;
@@ -461,7 +469,7 @@ export async function getNotificationsByTypeController(
  */
 export async function markNotificationAsReadController(
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ): Promise<Response> {
   try {
     const { id } = req.params;
@@ -479,7 +487,7 @@ export async function markNotificationAsReadController(
     const notification = await Notification.findOneAndUpdate(
       { _id: id, ...userFilter },
       { leido: true },
-      { new: true }
+      { new: true },
     );
 
     if (!notification) {

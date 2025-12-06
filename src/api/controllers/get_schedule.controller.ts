@@ -90,11 +90,9 @@ export async function getRequesterSchedulesByFixerDay(req: Request, res: Respons
   try {
     const { fixer_id, requester_id, searched_date } = req.query;
     if (!fixer_id || !requester_id || !searched_date) {
-      return res
-        .status(400)
-        .json({
-          message: 'Missing required query parameters: fixer_id, requester_id or searched_date.',
-        });
+      return res.status(400).json({
+        message: 'Missing required query parameters: fixer_id, requester_id or searched_date.',
+      });
     }
     if (
       typeof fixer_id !== 'string' ||
@@ -122,11 +120,9 @@ export async function getOtherRequesterSchedulesByFixerDay(req: Request, res: Re
   try {
     const { fixer_id, requester_id, searched_date } = req.query;
     if (!fixer_id || !requester_id || !searched_date) {
-      return res
-        .status(400)
-        .json({
-          message: 'Missing required query parameters: fixer_id, requester_id or searched_date.',
-        });
+      return res.status(400).json({
+        message: 'Missing required query parameters: fixer_id, requester_id or searched_date.',
+      });
     }
     if (
       typeof fixer_id !== 'string' ||
@@ -154,11 +150,9 @@ export async function getCancelledSchedulesByRequesterDay(req: Request, res: Res
   try {
     const { fixer_id, requester_id, searched_date } = req.query;
     if (!fixer_id || !requester_id || !searched_date) {
-      return res
-        .status(400)
-        .json({
-          message: 'Missing required query parameters: fixer_id, requester_id or searched_date.',
-        });
+      return res.status(400).json({
+        message: 'Missing required query parameters: fixer_id, requester_id or searched_date.',
+      });
     }
     if (
       typeof fixer_id !== 'string' ||
@@ -193,11 +187,9 @@ export async function getCancelledSchedulesByFixerDay(req: Request, res: Respons
   try {
     const { fixer_id, requester_id, searched_date } = req.query;
     if (!fixer_id || !requester_id || !searched_date) {
-      return res
-        .status(400)
-        .json({
-          message: 'Missing required query parameters: fixer_id, requester_id or searched_date.',
-        });
+      return res.status(400).json({
+        message: 'Missing required query parameters: fixer_id, requester_id or searched_date.',
+      });
     }
     if (
       typeof fixer_id !== 'string' ||

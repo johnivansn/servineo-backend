@@ -70,7 +70,7 @@ const walletSchema = new Schema<IWallet>(
         default: Date.now,
       },
     },
-    
+
     lastLowBalanceNotification: {
       type: Date,
       required: false,
@@ -78,7 +78,7 @@ const walletSchema = new Schema<IWallet>(
   },
   {
     timestamps: true, // Crea createdAt y updatedAt automáticamente
-  }
+  },
 );
 
 // Usa la colección 'wallets'

@@ -1,6 +1,6 @@
-import jwt, { SignOptions } from "jsonwebtoken";
+import jwt, { SignOptions } from 'jsonwebtoken';
 
-const JWT_SECRET: jwt.Secret = process.env.JWT_SECRET || "super_secret_key";
+const JWT_SECRET: jwt.Secret = process.env.JWT_SECRET || 'super_secret_key';
 
 export function generarToken(
   id: string,
@@ -8,7 +8,7 @@ export function generarToken(
   email: string,
   role: string,
   picture?: string,
-  expiresIn: SignOptions["expiresIn"] = "7d"
+  expiresIn: SignOptions['expiresIn'] = '7d',
 ): string {
   const payload = { id, name, email, role, picture };
   return jwt.sign(payload, JWT_SECRET, { expiresIn });

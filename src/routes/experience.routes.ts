@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import * as experienceController from '../controllers/experience.controller';
-import { verifyJWT } from '../middlewares/authMiddleware';//el token no se utiliza aun pero se dejara para futuras implementaciones
+import { verifyJWT } from '../middlewares/authMiddleware'; //el token no se utiliza aun pero se dejara para futuras implementaciones
 
 const router = Router();
 

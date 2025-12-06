@@ -22,12 +22,19 @@ router.get('/intent/:fixerId', async (req, res) => {
 
     const intent = await PaymentIntent.findOne({ fixerId, type: 'wallet', method: 'transfer' });
     if (!intent) {
-      return res.status(404).json({ error: 'NOT_FOUND', message: 'No existe transferencia para este fixer' });
+      return res
+        .status(404)
+        .json({ error: 'NOT_FOUND', message: 'No existe transferencia para este fixer' });
     }
 
-    const method = await ProviderPaymentMethod.findOne({ providerId: SERVINEO_PROVIDER_ID, active: true });
+    const method = await ProviderPaymentMethod.findOne({
+      providerId: SERVINEO_PROVIDER_ID,
+      active: true,
+    });
     if (!method) {
-      return res.status(404).json({ error: 'NO_TRANSFER_METHOD', message: 'No se encontró método de transferencia' });
+      return res
+        .status(404)
+        .json({ error: 'NO_TRANSFER_METHOD', message: 'No se encontró método de transferencia' });
     }
 
     return res.json({

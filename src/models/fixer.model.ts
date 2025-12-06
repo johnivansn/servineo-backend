@@ -57,7 +57,7 @@ const UserSchema = new Schema<IUser>(
       photoUrl: { type: String },
     },
   },
-  { collection: 'users', timestamps: true }
+  { collection: 'users', timestamps: true },
 );
 
 export const UserModel = mongoose.model<IUser>('User', UserSchema);

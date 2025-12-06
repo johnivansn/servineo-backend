@@ -43,17 +43,17 @@ const PaymentIntentSchema = new Schema<IPaymentIntent>({
 });
 
 // Validación condicional
-PaymentIntentSchema.pre('save', function(next) {
+PaymentIntentSchema.pre('save', function (next) {
   const paymentIntent = this as IPaymentIntent;
-  
+
   if (paymentIntent.type === 'service' && !paymentIntent.bookingId) {
     return next(new Error('bookingId es requerido para pagos de tipo service'));
   }
-  
+
   if (paymentIntent.type === 'service') {
     // Agregar lógica para hacer bookingId único solo para tipo service
   }
-  
+
   next();
 });
 

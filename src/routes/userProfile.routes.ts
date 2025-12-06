@@ -5,7 +5,7 @@ import {
   updateBio,
   getUsersByRole,
   convertToFixer,
-  getUserById    
+  getUserById,
 } from '../controllers/userProfile.controller';
 
 const router = Router();
@@ -17,7 +17,7 @@ router.post('/', createUserProfile);
 router.get('/', getUserProfiles);
 
 // Obtener un usuario por ID (para Redux o perfil individual)
-router.get('/user/:id', getUserById);   
+router.get('/user/:id', getUserById);
 
 // Editar bio
 router.patch('/:id/bio', updateBio);

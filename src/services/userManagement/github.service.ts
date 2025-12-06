@@ -1,6 +1,6 @@
-import fetch from "node-fetch";
-import { User } from "../../models/user.model";
-import { IUser } from "../../models/user.model";
+import fetch from 'node-fetch';
+import { User } from '../../models/user.model';
+import { IUser } from '../../models/user.model';
 
 interface GitHubUser {
   email: string;
@@ -15,13 +15,13 @@ export async function verifyGithubToken(token: string): Promise<GitHubUser | nul
 }
 
 export async function getGitHubUser(accessToken: string): Promise<GitHubUser | null> {
-  const userResp = await fetch("https://api.github.com/user", {
+  const userResp = await fetch('https://api.github.com/user', {
     headers: { Authorization: `token ${accessToken}` },
   });
 
   const userData = await userResp.json();
 
-  const emailResp = await fetch("https://api.github.com/user/emails", {
+  const emailResp = await fetch('https://api.github.com/user/emails', {
     headers: { Authorization: `token ${accessToken}` },
   });
 
@@ -40,8 +40,8 @@ export async function getGitHubUser(accessToken: string): Promise<GitHubUser | n
 
 export async function findUserByEmail(email: string): Promise<IUser | null> {
   return await User.findOne({
-    "authProviders.provider": "github",
-    "authProviders.providerId": email,
+    'authProviders.provider': 'github',
+    'authProviders.providerId': email,
   });
 }
 
@@ -53,33 +53,33 @@ export async function createUser(githubUser: GitHubUser): Promise<IUser> {
   const newUser = await User.create({
     name: githubUser.name,
     email: githubUser.email,
-    url_photo: githubUser.picture || "",
-    role: "requester",
+    url_photo: githubUser.picture || '',
+    role: 'requester',
 
     authProviders: [
       {
-        provider: "github",
+        provider: 'github',
         providerId: githubUser.email,
-        password: "",
+        password: '',
       },
     ],
 
-    telefono: "",
+    telefono: '',
     servicios: [],
 
     ubicacion: {
       lat: null,
       lng: null,
-      direccion: "",
-      departamento: "",
-      pais: "",
+      direccion: '',
+      departamento: '',
+      pais: '',
     },
 
-    ci: "",
+    ci: '',
 
     vehiculo: {
       hasVehiculo: false,
-      tipoVehiculo: "",
+      tipoVehiculo: '',
     },
 
     acceptTerms: false,
@@ -91,18 +91,18 @@ export async function createUser(githubUser: GitHubUser): Promise<IUser> {
     },
 
     experience: {
-      descripcion: "",
+      descripcion: '',
     },
 
     workLocation: {
       lat: null,
       lng: null,
-      direccion: "",
-      departamento: "",
-      pais: "",
+      direccion: '',
+      departamento: '',
+      pais: '',
     },
 
-    fixerProfile: "",
+    fixerProfile: '',
   });
 
   return newUser;

@@ -4,7 +4,7 @@ import {
   obtenerTodasLasOfertas,
   obtenerOfertasPorFixer,
   actualizarOferta,
-  eliminarOferta
+  eliminarOferta,
 } from '../controllers/newJobOffers.controller';
 
 const router = Router();
@@ -35,7 +35,18 @@ router.get('/fixer/:fixerId', async (req, res) => {
 // POST crear nueva oferta
 router.post('/', async (req, res) => {
   try {
-    const { description, city, services, price, fixerId, fixerName, whatsapp, photos, location, title } = req.body;
+    const {
+      description,
+      city,
+      services,
+      price,
+      fixerId,
+      fixerName,
+      whatsapp,
+      photos,
+      location,
+      title,
+    } = req.body;
 
     if (!fixerId || !fixerName || !whatsapp) {
       return res.status(400).json({ error: 'fixerId, fixerName y whatsapp son obligatorios' });

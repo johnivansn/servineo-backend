@@ -54,7 +54,7 @@ export async function createSimpleActivity(req: Request, res: Response) {
 
     res.status(200);
   } catch (error) {
-    const { type } = req.body
+    const { type } = req.body;
     console.log(`Error creating ${type} Activity:`, error);
     res.status(500).json({ error: `Error creating ${type} Activity` });
   }

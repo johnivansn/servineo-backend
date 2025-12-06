@@ -12,7 +12,7 @@ async function createTestEvent() {
 
   const start = new Date();
   start.setHours(start.getHours() + 1); // Empieza en 1 hora
-  
+
   const end = new Date(start);
   end.setMinutes(end.getMinutes() + 30); // Dura 30 mins
 
@@ -37,13 +37,12 @@ async function createTestEvent() {
     console.log('✅ ¡ÉXITO! Evento creado.');
     console.log('🔗 Link al evento:', response.data.htmlLink);
     console.log('🆔 ID del evento:', response.data.id);
-    
   } catch (error: any) {
     console.error('❌ ERROR al crear el evento:');
     console.error(error.message);
-    
+
     if (error.response) {
-        console.error('Detalles de Google:', error.response.data);
+      console.error('Detalles de Google:', error.response.data);
     }
   }
 }

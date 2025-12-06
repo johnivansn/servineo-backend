@@ -7,4 +7,3 @@ const router = Router();
 router.post('/check-status', checkTwoFactorStatusController);
 
 export default router;
-

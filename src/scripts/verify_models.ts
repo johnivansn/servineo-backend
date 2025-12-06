@@ -11,9 +11,9 @@ const verifyModels = async () => {
   try {
     console.log('Verifying models...');
 
-    // We don't need to connect to DB to check schema validation, 
+    // We don't need to connect to DB to check schema validation,
     // but we do need to check if models load without error.
-    
+
     // Create dummy instances to check validation
     const jobOffer = new JobOffer({
       fixerId: new mongoose.Types.ObjectId(),

@@ -1,11 +1,11 @@
-import fs from "fs";
-import path from "path";
-import mime from "mime-types";
-import { google } from "googleapis";
+import fs from 'fs';
+import path from 'path';
+import mime from 'mime-types';
+import { google } from 'googleapis';
 
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_DRIVE_CLIENT_ID,
-  process.env.GOOGLE_DRIVE_CLIENT_SECRET
+  process.env.GOOGLE_DRIVE_CLIENT_SECRET,
 );
 
 // Usamos el refresh token para autenticación automática
@@ -15,7 +15,7 @@ oauth2Client.setCredentials({
 
 export async function uploadToGoogleDrive(filePath: string, fileName?: string) {
   const drive = google.drive({
-    version: "v3",
+    version: 'v3',
     auth: oauth2Client,
   });
 
@@ -28,25 +28,25 @@ export async function uploadToGoogleDrive(filePath: string, fileName?: string) {
   }
 
   const media = {
-    mimeType: mime.lookup(filePath) || "image/jpeg",
+    mimeType: mime.lookup(filePath) || 'image/jpeg',
     body: fs.createReadStream(filePath),
   };
 
   const response = await drive.files.create({
     requestBody: fileMetadata,
     media,
-    fields: "id",
+    fields: 'id',
   });
 
   const fileId = response.data.id;
-  if (!fileId) throw new Error("Google Drive no devolvió fileId");
+  if (!fileId) throw new Error('Google Drive no devolvió fileId');
 
   // Hacer el archivo público
   await drive.permissions.create({
     fileId,
     requestBody: {
-      role: "reader",
-      type: "anyone",
+      role: 'reader',
+      type: 'anyone',
     },
   });
 

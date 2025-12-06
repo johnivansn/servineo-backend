@@ -22,13 +22,11 @@ export async function updateAppointmentById(req: Request, res: Response) {
     return res.status(200).json({ message: 'Updated succesfully', modified });
   } catch (err) {
     console.log(err);
-    return res
-      .status(500)
-      .json({
-        message: 'Error updating appointment data.',
-        modified: false,
-        error: (err as Error).message,
-      });
+    return res.status(500).json({
+      message: 'Error updating appointment data.',
+      modified: false,
+      error: (err as Error).message,
+    });
   }
 }
 
@@ -45,12 +43,10 @@ export async function updateFixerAvailability(req: Request, res: Response) {
       .status(200)
       .json({ message: 'Fixer availability updated successfully.', updated: true });
   } catch (err) {
-    return res
-      .status(500)
-      .json({
-        message: 'Error al actualizar disponibilidad: ' + (err as Error).message,
-        updated: false,
-      });
+    return res.status(500).json({
+      message: 'Error al actualizar disponibilidad: ' + (err as Error).message,
+      updated: false,
+    });
   }
 }
 

@@ -1,11 +1,11 @@
-import { ObjectId } from "mongodb";
+import { ObjectId } from 'mongodb';
 
 export interface IUser {
   _id?: ObjectId;
   name: string;
   email: string;
   url_photo?: string;
-  role: "requester";
+  role: 'requester';
   authProviders?: Array<{
     provider: string;
     providerId: string;

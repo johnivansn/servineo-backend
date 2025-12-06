@@ -52,16 +52,20 @@ export async function saveTempSecretForUser(userId: string, secretPlain: string)
   const mongoClient = await clientPromise;
   const db = mongoClient.db('ServineoBD');
   const enc = encryptSecret(secretPlain);
-  await db.collection('users').updateOne(
-    { _id: new (require('mongodb').ObjectId)(userId) },
-    { $set: { tempTwoFactorSecret: enc, tempTwoFactorIssuedAt: new Date() } }
-  );
+  await db
+    .collection('users')
+    .updateOne(
+      { _id: new (require('mongodb').ObjectId)(userId) },
+      { $set: { tempTwoFactorSecret: enc, tempTwoFactorIssuedAt: new Date() } },
+    );
 }
 
 export async function getTempSecretForUser(userId: string) {
   const mongoClient = await clientPromise;
   const db = mongoClient.db('ServineoBD');
-  const user = await db.collection('users').findOne({ _id: new (require('mongodb').ObjectId)(userId) });
+  const user = await db
+    .collection('users')
+    .findOne({ _id: new (require('mongodb').ObjectId)(userId) });
   if (!user?.tempTwoFactorSecret) return null;
   try {
     return decryptSecret(user.tempTwoFactorSecret);
@@ -70,12 +74,16 @@ export async function getTempSecretForUser(userId: string) {
   }
 }
 
-export async function activateTwoFactorForUser(userId: string, secretPlain: string, recoveryCodesPlain: string[]) {
+export async function activateTwoFactorForUser(
+  userId: string,
+  secretPlain: string,
+  recoveryCodesPlain: string[],
+) {
   const mongoClient = await clientPromise;
   const db = mongoClient.db('ServineoBD');
   const enc = encryptSecret(secretPlain);
   // hash recovery codes
-  const hashed = recoveryCodesPlain.map(c => crypto.createHash('sha256').update(c).digest('hex'));
+  const hashed = recoveryCodesPlain.map((c) => crypto.createHash('sha256').update(c).digest('hex'));
   await db.collection('users').updateOne(
     { _id: new (require('mongodb').ObjectId)(userId) },
     {
@@ -86,17 +94,19 @@ export async function activateTwoFactorForUser(userId: string, secretPlain: stri
         recoveryCodes: hashed,
       },
       $unset: { tempTwoFactorSecret: '', tempTwoFactorIssuedAt: '' },
-    }
+    },
   );
 }
 
 export async function disableTwoFactorForUser(userId: string) {
   const mongoClient = await clientPromise;
   const db = mongoClient.db('ServineoBD');
-  await db.collection('users').updateOne(
-    { _id: new (require('mongodb').ObjectId)(userId) },
-    { $set: { twoFactorEnabled: false }, $unset: { twoFactorSecret: '', recoveryCodes: '' } }
-  );
+  await db
+    .collection('users')
+    .updateOne(
+      { _id: new (require('mongodb').ObjectId)(userId) },
+      { $set: { twoFactorEnabled: false }, $unset: { twoFactorSecret: '', recoveryCodes: '' } },
+    );
 }
 
 export function genRecoveryCodes(count = 8) {

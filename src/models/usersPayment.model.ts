@@ -15,5 +15,4 @@ const userSchema = new mongoose.Schema(
 );
 
 // ⚙️ Usa exactamente la colección 'userpay'
-export default mongoose.model("users", userSchema, "users");
-
+export default mongoose.model('users', userSchema, 'users');

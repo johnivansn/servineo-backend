@@ -5,13 +5,7 @@ import { bucket } from '../config/firebase.config';
 export const upgradeToFixer = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const {
-      ci,
-      servicios,
-      vehiculo,
-      metodoPago,
-      acceptTerms,
-    } = req.body;
+    const { ci, servicios, vehiculo, metodoPago, acceptTerms } = req.body;
 
     // 1. Validar que el usuario exista
     const user = await User.findById(userId);

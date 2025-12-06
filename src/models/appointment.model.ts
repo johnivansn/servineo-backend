@@ -26,44 +26,44 @@ const appointmentSchema = new Schema<IAppointment>(
   {
     id_fixer: { type: String, required: true },
     id_requester: { type: String, required: true },
-    
+
     selected_date: { type: Date, required: true, default: Date.now },
     current_requester_name: { type: String, required: true },
-    
-    appointment_type: { 
-      type: String, 
-      enum: ['virtual', 'presential'], 
-      required: true, 
-      default: 'virtual' 
+
+    appointment_type: {
+      type: String,
+      enum: ['virtual', 'presential'],
+      required: true,
+      default: 'virtual',
     },
-    
+
     appointment_description: { type: String },
     link_id: { type: String },
     current_requester_phone: { type: String, required: true },
-    
+
     starting_time: { type: Date, required: true },
     finishing_time: { type: Date },
-    
-    schedule_state: { 
-      type: String, 
-      enum: ['cancelled', 'booked'], 
-      required: true, 
-      default: 'booked' 
+
+    schedule_state: {
+      type: String,
+      enum: ['cancelled', 'booked'],
+      required: true,
+      default: 'booked',
     },
-    
+
     display_name_location: { type: String },
     lat: { type: String },
     lon: { type: String },
-    
+
     cancelled_fixer: { type: Boolean, default: false },
-    reprogram_reason: { type: String, default: '' }
+    reprogram_reason: { type: String, default: '' },
   },
-  { 
-    timestamps: true 
-  }
+  {
+    timestamps: true,
+  },
 );
 
-
-export const Appointment = models.Appointment || model<IAppointment>('Appointment', appointmentSchema);
+export const Appointment =
+  models.Appointment || model<IAppointment>('Appointment', appointmentSchema);
 
 export default Appointment;

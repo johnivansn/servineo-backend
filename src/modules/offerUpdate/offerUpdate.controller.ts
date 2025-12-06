@@ -12,7 +12,6 @@ export async function handleUpdateOffer(req: Request, res: Response) {
 
     const updatedOffer = await updateOfferState(offerId, state as 'active' | 'inactive');
     res.status(200).json({ success: true, ...updatedOffer });
-
   } catch (err: any) {
     console.error(err);
     if (err.message === 'ID inválido' || err.message === 'Oferta no encontrada') {

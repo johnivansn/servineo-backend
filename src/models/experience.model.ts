@@ -45,7 +45,7 @@ const experienceSchema = new Schema<IExperience>(
   {
     timestamps: true,
     collection: 'experiences',
-  }
+  },
 );
 
 experienceSchema.index({ fixerId: 1 });

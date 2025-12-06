@@ -10,10 +10,7 @@ function toObjectId(id: string | Types.ObjectId): Types.ObjectId {
  * Lista de publicaciones de foro (para la pantalla principal)
  */
 export async function listForums(): Promise<IForum[]> {
-  const forums = await Forum.find({})
-    .sort({ lastActivityAt: -1 })
-    .lean()
-    .exec();
+  const forums = await Forum.find({}).sort({ lastActivityAt: -1 }).lean().exec();
 
   return forums as unknown as IForum[];
 }
@@ -24,8 +21,7 @@ export async function listForums(): Promise<IForum[]> {
 // src/api/services/forum.service.ts
 export async function createForum(data: any) {
   try {
-    const { titulo, descripcion, categoria, authorId, authorRole, authorName } =
-      data;
+    const { titulo, descripcion, categoria, authorId, authorRole, authorName } = data;
 
     const newForum = new Forum({
       titulo,
@@ -38,11 +34,10 @@ export async function createForum(data: any) {
 
     return await newForum.save();
   } catch (error) {
-    console.error("Error in createForum service:", error);
+    console.error('Error in createForum service:', error);
     throw new Error(String(error));
   }
 }
-
 
 /**
  * Obtiene una publicación y sus comentarios

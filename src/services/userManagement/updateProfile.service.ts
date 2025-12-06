@@ -1,8 +1,8 @@
-import jwt from "jsonwebtoken";
-import { ObjectId } from "mongodb";
-import { connectDB } from "../../config/db/mongoClient";
+import jwt from 'jsonwebtoken';
+import { ObjectId } from 'mongodb';
+import { connectDB } from '../../config/db/mongoClient';
 
-const JWT_SECRET = process.env.JWT_SECRET || "super_secret_key";
+const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_key';
 
 export async function updateProfileService(token: string, data: any) {
   const decoded: any = jwt.verify(token, JWT_SECRET);
@@ -21,26 +21,21 @@ export async function updateProfileService(token: string, data: any) {
     updateData.ubicacion = {
       lat: data.ubicacion.lat || 0,
       lng: data.ubicacion.lng || 0,
-      direccion: data.ubicacion.direccion || "",
-      departamento: data.ubicacion.departamento || "",
-      pais: data.ubicacion.pais || "",
+      direccion: data.ubicacion.direccion || '',
+      departamento: data.ubicacion.departamento || '',
+      pais: data.ubicacion.pais || '',
     };
   }
 
-  await db.collection("users").updateOne(
-    { _id: new ObjectId(userId) },
-    { $set: updateData }
-  );
+  await db.collection('users').updateOne({ _id: new ObjectId(userId) }, { $set: updateData });
 
-const updatedUser = await db.collection("users").findOne({ _id: new ObjectId(userId) });
+  const updatedUser = await db.collection('users').findOne({ _id: new ObjectId(userId) });
 
-if (!updatedUser) {
-  throw new Error("Usuario no encontrado");
+  if (!updatedUser) {
+    throw new Error('Usuario no encontrado');
+  }
+
+  delete (updatedUser as any).password;
+
+  return updatedUser;
 }
-
-delete (updatedUser as any).password;
-
-return updatedUser;
-
-}
-

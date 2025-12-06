@@ -1,4 +1,4 @@
-// ruta par certificaciones official 
+// ruta par certificaciones official
 import { Schema, model, models, Document, Types } from 'mongoose';
 
 export interface ICertification extends Document {
@@ -45,10 +45,11 @@ const certificationSchema = new Schema<ICertification>(
   {
     timestamps: true,
     collection: 'certifications',
-  }
+  },
 );
 
 certificationSchema.index({ fixerId: 1 });
 
-export const Certification = models.Certification || model<ICertification>('Certification', certificationSchema);
+export const Certification =
+  models.Certification || model<ICertification>('Certification', certificationSchema);
 export default Certification;

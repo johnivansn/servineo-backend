@@ -3,12 +3,12 @@
 import { Router } from 'express';
 import { createBankAccount, deleteBankAccount } from '../controllers/bankAccount.controller';
 // ⚠️ IMPORTACIÓN CORREGIDA A LA NUEVA CARPETA
-import { verifyRecaptchaV2 } from '../../captchaPagos/recaptchaV2.middleware'; 
+import { verifyRecaptchaV2 } from '../../captchaPagos/recaptchaV2.middleware';
 
 const router = Router();
 
 // Aplicar el middleware de CAPTCHA antes de la creación
-router.post('/bank-accounts', verifyRecaptchaV2, createBankAccount); 
+router.post('/bank-accounts', verifyRecaptchaV2, createBankAccount);
 
 // Aplicar el middleware de CAPTCHA antes de la eliminación
 router.delete('/bank-accounts/:fixerId', verifyRecaptchaV2, deleteBankAccount);

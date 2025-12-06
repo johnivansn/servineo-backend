@@ -13,18 +13,13 @@ export async function isLocked(userId: string) {
   const db = client.db('ServineoBD');
   const user = await db
     .collection('users')
-    .findOne(
-      { _id: new ObjectId(userId) },
-      { projection: { twoFactorLockedUntil: 1 } }
-    );
+    .findOne({ _id: new ObjectId(userId) }, { projection: { twoFactorLockedUntil: 1 } });
 
   const raw = user?.twoFactorLockedUntil ?? null;
   const lockedUntil = raw ? new Date(raw) : null;
 
   if (lockedUntil && lockedUntil.getTime() > Date.now()) {
-    const retryAfterSeconds = Math.ceil(
-      (lockedUntil.getTime() - Date.now()) / 1000
-    );
+    const retryAfterSeconds = Math.ceil((lockedUntil.getTime() - Date.now()) / 1000);
     return {
       locked: true,
       lockedUntil: lockedUntil.toISOString(),
@@ -52,7 +47,7 @@ export async function recordFailedAttempt(userId: string) {
     {
       $inc: { twoFactorFailedAttempts: 1 },
       $set: { updatedAt: new Date() },
-    }
+    },
   );
 
   // si no matcheó ningún user, devolvemos algo neutro
@@ -68,7 +63,7 @@ export async function recordFailedAttempt(userId: string) {
   // 2) leemos el valor ACTUAL desde la BD
   const user = await col.findOne(
     { _id: new ObjectId(userId) },
-    { projection: { twoFactorFailedAttempts: 1 } }
+    { projection: { twoFactorFailedAttempts: 1 } },
   );
 
   let attempts = 0;
@@ -87,7 +82,7 @@ export async function recordFailedAttempt(userId: string) {
           updatedAt: new Date(),
         },
         $unset: { twoFactorFailedAttempts: '' },
-      }
+      },
     );
     return {
       locked: true,
@@ -117,6 +112,6 @@ export async function resetAttempts(userId: string) {
         twoFactorLockedUntil: '',
       },
       $set: { updatedAt: new Date() },
-    }
+    },
   );
 }

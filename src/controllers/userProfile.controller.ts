@@ -7,7 +7,7 @@ import { User } from '../models/user.model';
  */
 export const createUserProfile = async (
   req: Request<{}, {}, IUserProfile>,
-  res: Response<IUserProfile | { error: string }>
+  res: Response<IUserProfile | { error: string }>,
 ) => {
   try {
     const userProfile = new userProfileModel(req.body);
@@ -23,7 +23,7 @@ export const createUserProfile = async (
  */
 export const getUserProfiles = async (
   _req: Request,
-  res: Response<IUserProfile[] | { error: string }>
+  res: Response<IUserProfile[] | { error: string }>,
 ) => {
   try {
     const profiles = await userProfileModel.find();
@@ -35,7 +35,7 @@ export const getUserProfiles = async (
 
 export const getUserById = async (
   req: Request<{ id: string }>,
-  res: Response<IUserProfile | { error: string }>
+  res: Response<IUserProfile | { error: string }>,
 ) => {
   try {
     const { id } = req.params;
@@ -55,7 +55,7 @@ export const getUserById = async (
 
 export const updateBio = async (
   req: Request<{ id: string }, {}, { bio: string }>,
-  res: Response
+  res: Response,
 ) => {
   try {
     const { id } = req.params;
@@ -63,7 +63,7 @@ export const updateBio = async (
     const updated = await userProfileModel.findOneAndUpdate(
       { 'user.id': id },
       { $set: { 'profile.additionalInfo.bio': bio } },
-      { new: true }
+      { new: true },
     );
     if (!updated) return res.status(404).json({ error: 'User not found' });
     res.json(updated);
@@ -72,10 +72,7 @@ export const updateBio = async (
   }
 };
 
-export const getUsersByRole = async (
-  req: Request<{ role: string }>,
-  res: Response
-) => {
+export const getUsersByRole = async (req: Request<{ role: string }>, res: Response) => {
   try {
     const { role } = req.params;
     const users = await userProfileModel.find({ 'user.role': role });
@@ -87,7 +84,7 @@ export const getUsersByRole = async (
 
 export const convertToFixer = async (
   req: Request<{ id: string }, {}, { profile: any }>,
-  res: Response
+  res: Response,
 ) => {
   try {
     const { id } = req.params;
@@ -103,24 +100,24 @@ export const convertToFixer = async (
       ci: profile.ci,
       servicios: profile.services ? profile.services.map((s: any) => s.name) : [],
       vehiculo: profile.vehicle,
-      metodoPago: profile.paymentMethods ? {
-        hasEfectivo: profile.paymentMethods.some((p: any) => p.type === 'efectivo'),
-        qr: profile.paymentMethods.some((p: any) => p.type === 'qr'),
-        tarjetaCredito: profile.paymentMethods.some((p: any) => p.type === 'tarjeta'),
-      } : undefined,
+      metodoPago: profile.paymentMethods
+        ? {
+            hasEfectivo: profile.paymentMethods.some((p: any) => p.type === 'efectivo'),
+            qr: profile.paymentMethods.some((p: any) => p.type === 'qr'),
+            tarjetaCredito: profile.paymentMethods.some((p: any) => p.type === 'tarjeta'),
+          }
+        : undefined,
       workLocation: profile.location,
       acceptTerms: profile.terms?.accepted,
-      fixerProfile: 'completed'
+      fixerProfile: 'completed',
     };
 
     // Clean undefined values
-    Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
-
-    const updatedUser = await User.findByIdAndUpdate(
-      id,
-      { $set: updateData },
-      { new: true }
+    Object.keys(updateData).forEach(
+      (key) => updateData[key] === undefined && delete updateData[key],
     );
+
+    const updatedUser = await User.findByIdAndUpdate(id, { $set: updateData }, { new: true });
 
     if (!updatedUser) return res.status(404).json({ error: 'User not found' });
     res.json(updatedUser);
@@ -131,7 +128,9 @@ export const convertToFixer = async (
     if (error.name === 'CastError') {
       message = `ID inválido: ${error.value}`;
     } else if (error.name === 'ValidationError') {
-      message = Object.values(error.errors).map((e: any) => e.message).join(', ');
+      message = Object.values(error.errors)
+        .map((e: any) => e.message)
+        .join(', ');
     } else if (error.message) {
       message = error.message;
     }

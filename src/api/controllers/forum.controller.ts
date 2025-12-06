@@ -17,16 +17,15 @@ function getAuthUser(req: Request): AuthUser | null {
     // Soportar distintas formas de id viniendo del JWT
     const id =
       raw._id ??
-      raw.id ??        // típico cuando se firma como { id: ... }
-      raw.userId ??    // por si algún login usa userId
-      raw.sub;         // por si viene de OAuth/JWT estándar
+      raw.id ?? // típico cuando se firma como { id: ... }
+      raw.userId ?? // por si algún login usa userId
+      raw.sub; // por si viene de OAuth/JWT estándar
 
     // Nombre: toma lo que haya
     const name = raw.name ?? raw.username ?? raw.email;
 
     // Rol: si no viene en el token, usamos requester por defecto
-    const role: AuthUser["role"] =
-      raw.role ?? "requester";
+    const role: AuthUser['role'] = raw.role ?? 'requester';
 
     if (!id || !name) {
       // Si aún así no hay datos mínimos, lo tratamos como no autenticado
@@ -51,7 +50,6 @@ function getAuthUser(req: Request): AuthUser | null {
 
   return null;
 }
-
 
 export async function listForumsController(req: Request, res: Response) {
   try {
