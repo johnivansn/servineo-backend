@@ -1,8 +1,11 @@
+// servineo-backend/src/api/controllers/wallet.controller.ts
+import type { Request, Response } from 'express';
 import Stripe from 'stripe';
 import { Wallet } from '../../models/wallet.model';
-import { User } from '../../models/userPayment.model';
+import { User } from '../../models/user.model';
 import { Recharge } from '../../models/walletRecharge.model';
-import { Request, Response } from 'express';
+import { computeWalletFlags } from '../../models/wallet/flags';
+import { logFlagChangeHuman } from '../../models/wallet/prettyLog';
 
 import 'dotenv/config';
 
@@ -18,7 +21,7 @@ export const rechargeWallet = async (req: Request, res: Response) => {
   try {
     console.log('🔹 Entrada a rechargeWallet');
 
-    const { userId, amount } = req.body;
+    const { userId, amount } = req.body as any;
     console.log('📥 Datos recibidos:', { userId, amount });
 
     const amountNumber = parseFloat(amount);
@@ -53,6 +56,9 @@ export const rechargeWallet = async (req: Request, res: Response) => {
       console.log('🔹 Wallet encontrado:', wallet);
     }
 
+    // Guardamos el balance anterior antes de recargar (para recalcular flags)
+    const previousBalance = Number(wallet.balance ?? 0);
+
     // 3️⃣ Crear PaymentIntent en Stripe
     console.log('🔹 Creando PaymentIntent en Stripe');
     const paymentIntent = await stripe.paymentIntents.create({
@@ -67,6 +73,50 @@ export const rechargeWallet = async (req: Request, res: Response) => {
     wallet.balance += amountNumber;
     await wallet.save();
     console.log(`💰 Wallet de ${user.name} actualizado. Nuevo saldo: ${wallet.balance}`);
+
+    // 4.1️ Recalcular flags de saldo bajo / crítico con la misma lógica centralizada
+    try {
+      const pre = previousBalance;
+      const post = Number(wallet.balance ?? 0);
+      const thr = Number(wallet.lowBalanceThreshold ?? 0);
+
+      const { nextFlags, state, changed, crossed } = computeWalletFlags({
+        preBalance: pre,
+        postBalance: post,
+        lowBalanceThreshold: thr,
+        prevFlags: (wallet as any).flags ?? null,
+      });
+
+      if (changed) {
+        logFlagChangeHuman({
+          fixerId: String(wallet.users_id),
+          pre,
+          post,
+          thr,
+          state,
+          crossed,
+          flags: nextFlags,
+          currency: wallet.currency || 'BOB',
+        });
+
+        const patch: any = {
+          flags: nextFlags,
+        };
+
+        // Si sigue en low/critical, actualizamos lastLowBalanceNotification;
+        // si ya salió de low/critical, podemos dejarla como está o limpiarla.
+        if (nextFlags.needsLowAlert || nextFlags.needsCriticalAlert) {
+          patch.lastLowBalanceNotification = new Date();
+        }
+
+        await Wallet.findByIdAndUpdate(wallet._id, { $set: patch });
+        console.log('✅ Flags de wallet recalculados tras recarga:', nextFlags);
+      } else {
+        console.log('ℹ️ Flags de wallet sin cambios tras recarga');
+      }
+    } catch (flagErr) {
+      console.error('⚠️ No se pudieron recalcular flags de wallet tras recarga:', flagErr);
+    }
 
     // 5️⃣ Intentar registrar la recarga
 

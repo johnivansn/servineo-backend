@@ -87,7 +87,7 @@ const manejarIntentoFallido = async (db: any, userId: string, usuario: any) => {
     { projection: { passwordAttempts: 1 } }
   );
   
-  let attempts = usuarioActual?.passwordAttempts || { count: 0, lastAttempt: null, blockedUntil: null };
+  const attempts = usuarioActual?.passwordAttempts || { count: 0, lastAttempt: null, blockedUntil: null };
 
   attempts.count += 1;
   attempts.lastAttempt = ahora;

@@ -25,14 +25,15 @@ export type OfferFilterOptions = {
   tags?: string[] | string;
   minPrice?: string;
   maxPrice?: string;
-  // Optional specific date filter in format YYYY-MM-DD
   date?: string;
 
-  // Optional rating filter (integer 1..5)
   rating?: number;
+  ratingIsDecimal?: boolean;
 
   searchMode?: 'exact' | 'smart';
   searchFields?: string[];
+
+  status?: boolean;
 };
 
 // ============================================
@@ -51,7 +52,6 @@ export const getAllOffers = async () => {
 
 // MODIFICAR getOffersFiltered
 export const getOffersFiltered = async (options?: OfferFilterOptions) => {
-  // Si no hay opciones, devolver el resultado sin filtros
   if (!options) {
     return await QueryExecutor.execute(Offer, {}, null, 0, 10);
   }
@@ -114,10 +114,16 @@ export const getOffersFiltered = async (options?: OfferFilterOptions) => {
   // 3.2. Lógica para filtro de CALIFICACIÓN (CORREGIDA)
   if (options && typeof options.rating === 'number' && !isNaN(options.rating)) {
     const star = options.rating;
+    const isDecimalForm = options.ratingIsDecimal === true;
 
-    // Si es un número entero (viene del filtro de estrellas básico)
-    if (Number.isInteger(star) && star >= 1 && star <= 5) {
-      // Lógica del filtro BÁSICO (Rango [N.0, (N+1).0))
+    // Si fue enviado como decimal explícito (ej: "1.0", "4.2")
+    if (isDecimalForm) {
+      // Comparación exacta (búsqueda para valor específico)
+      filterQuery = FilterCommon.combine(filterQuery, { rating: star });
+    }
+    // Si es número entero sin punto decimal (ej: "1", "2", "3")
+    else if (Number.isInteger(star) && star >= 1 && star <= 5) {
+      // Rango [N.0, (N+1).0) (búsqueda básica de estrellas)
       const minRating = star;
       const maxRatingExclusive = star + 1;
 
@@ -125,11 +131,16 @@ export const getOffersFiltered = async (options?: OfferFilterOptions) => {
         rating: { $gte: minRating, $lt: maxRatingExclusive },
       });
     }
-    // Si es un decimal (viene de la búsqueda avanzada o un filtro exacto)
+    // Fallback para otros decimales en rango válido
     else if (star >= 1.0 && star <= 5.9) {
-      // Lógica del filtro AVANZADO (Comparación exacta)
+      // Comparación exacta
       filterQuery = FilterCommon.combine(filterQuery, { rating: star });
     }
+  }
+
+  // 3.3. Lógica para filtro de STATUS
+  if (options && typeof options.status === 'boolean') {
+    filterQuery = FilterCommon.combine(filterQuery, { status: options.status });
   }
 
   const finalQuery = FilterCommon.combine(filterQuery, searchQuery);
@@ -153,7 +164,7 @@ export const getPriceRanges = async (buckets = 4, includeExtremes = true) => {
   // MEJORA AGREGADA: Verificar caché primero
   // ============================================
   const now = Date.now();
-  if (priceRangesCache && (now - priceRangesCache.timestamp) < CACHE_DURATION) {
+  if (priceRangesCache && now - priceRangesCache.timestamp < CACHE_DURATION) {
     return priceRangesCache.data;
   }
 

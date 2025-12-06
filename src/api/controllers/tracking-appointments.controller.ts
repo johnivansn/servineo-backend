@@ -13,7 +13,7 @@ export const getMapLocations = async (req: Request, res: Response) => {
     }).lean();
 
 
-    let userMap: Record<string, string> = {};
+    const userMap: Record<string, string> = {};
     
     try {
       if (appointments.length > 0) {
@@ -57,7 +57,7 @@ export const getMapLocations = async (req: Request, res: Response) => {
 export const getTrackingMetrics = async (req: Request, res: Response) => {
   try {
     const { startDate, endDate } = req.query;
-    let matchStage: any = {};
+    const matchStage: any = {};
 
     if (startDate || endDate) {
       matchStage.starting_time = {};
