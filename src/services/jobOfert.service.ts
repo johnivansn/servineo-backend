@@ -25,18 +25,14 @@ export type OfferFilterOptions = {
   tags?: string[] | string;
   minPrice?: string;
   maxPrice?: string;
-  // Optional specific date filter in format YYYY-MM-DD
   date?: string;
 
-  // Optional rating filter (integer 1..5 for range, or decimal 1.0..5.9 for exact match)
   rating?: number;
-  // Indica si el rating fue enviado como decimal explícito (ej: "1.0", "4.2")
   ratingIsDecimal?: boolean;
 
   searchMode?: 'exact' | 'smart';
   searchFields?: string[];
 
-  // Optional status filter (boolean)
   status?: boolean;
 };
 
@@ -56,7 +52,6 @@ export const getAllOffers = async () => {
 
 // MODIFICAR getOffersFiltered
 export const getOffersFiltered = async (options?: OfferFilterOptions) => {
-  // Si no hay opciones, devolver el resultado sin filtros
   if (!options) {
     return await QueryExecutor.execute(Offer, {}, null, 0, 10);
   }
